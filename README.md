@@ -3,7 +3,7 @@
 
 # Omni Icon Vault
 
-### One local icon workspace for Figma, websites, apps, terminals, and design systems.
+### One beautiful local icon workspace for Figma, websites, apps, terminals, and design systems.
 
 Search tens of thousands of icons from many open-source ecosystems, collect favicons, add your own SVGs, then reuse the **same canonical icon ID** across design and code.
 
@@ -26,11 +26,26 @@ Search tens of thousands of icons from many open-source ecosystems, collect favi
 </div>
 
 <p align="center">
-  <img src="docs/assets/omni-hero.svg" alt="Omni Icon Vault workspace" width="100%" />
+  <img src="docs/assets/omni-4.2-showcase.svg" alt="Omni Icon Vault 4.2 workspace" width="100%" />
 </p>
 
 > [!NOTE]
 > Omni is local-first. After the initial icon-source download, browsing, filtering, copying, Figma lookup, CLI search, and project exports run against your local index.
+
+
+> [!TIP]
+> **New in 4.2:** React JSX copy/filter, icon deep links, Discover shortcuts, keyboard command guide, 8–512 px exact previews with presets, and a more polished Figma workflow.
+
+## 4.2 Flagship release
+
+| New capability | What it changes |
+|---|---|
+| **React JSX copy/filter** | narrow the grid to SVG-backed icons and copy a ready component |
+| **Icon deep links** | reopen the exact canonical icon later with a shareable localhost URL |
+| **Discover shortcuts** | jump straight into arrows, media, files, commerce, social, developer or map searches |
+| **Precision previews** | type any size from 8–512 px or use common presets |
+| **Keyboard guide** | press `?` for shortcuts; `R` surprises, `F` favorites |
+| **Figma presets** | choose common insert sizes without retyping values |
 
 ## Why Omni?
 
@@ -51,11 +66,15 @@ Icon workflows tend to fragment: one pack in Figma, another package in frontend 
 - **True copy-capability filters** — SVG shows SVG-capable icons, Glyph shows real glyph-capable icons, and the same applies to HTML/CSS.
 - **Figma development plugin** powered by the same local API.
 - **Favorites and recent history** for quick reuse.
-- **Exact preview sizing** with synchronized slider + numeric pixel input.
+- **Exact preview sizing** from 8–512 px with synchronized slider, numeric input, and presets.
 - **Custom SVGs and favicons** indexed beside upstream packs.
 - **Cross-platform installers** for Windows, macOS and Linux.
-- **Design-to-code exports** for React, Vue, Svelte, SVG, HTML, CSS and JSON.
+- **Design-to-code exports** for React, Vue, Svelte, SVG, HTML, CSS and JSON — plus one-click React JSX copy in the Web UI.
 - **Canonical IDs** that survive across browser, CLI, API, Figma and project manifests.
+
+<p align="center">
+  <img src="docs/assets/omni-4.2-bento.svg" alt="Omni Icon Vault 4.2 feature highlights" width="100%" />
+</p>
 
 ## One source of truth
 
@@ -156,6 +175,9 @@ The local workspace supports:
 - foreground/background preview controls
 - slider + exact pixel size input
 - direct copy and download actions
+- React JSX copy/filter for SVG-backed icons
+- shareable deep links for exact icon details
+- Discover shortcuts and an in-app keyboard guide
 
 Useful shortcuts:
 
@@ -164,7 +186,10 @@ Useful shortcuts:
 | `/` or `Ctrl/Cmd + K` | focus search |
 | `Enter` | open the first/focused result |
 | `C` | copy with the active copy mode |
-| `Esc` | close details |
+| `R` | open a random matching icon |
+| `F` | toggle favorite for the open icon |
+| `?` | open the keyboard guide |
+| `Esc` | close details or dialogs |
 
 See [docs/WEB_UI.md](docs/WEB_UI.md) for the full guide.
 

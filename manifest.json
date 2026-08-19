@@ -1,8 +1,8 @@
 {
   "name": "Omni Icon Vault",
-  "version": "4.1.3",
+  "version": "4.2.0",
   "channel": "stable",
-  "description": "Cross-platform local icon workspace with fast API-driven search, Figma integration, favicons and design-to-code export.",
+  "description": "Flagship cross-platform local icon workspace with discovery, deep links, React copy, Figma integration, favicons and design-to-code export.",
   "platforms": [
     "Windows 10/11",
     "macOS",

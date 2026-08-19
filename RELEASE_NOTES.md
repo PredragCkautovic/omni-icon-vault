@@ -1,25 +1,26 @@
-# Omni Icon Vault 4.1.3
+# Omni Icon Vault 4.2.0 — Flagship Release
 
-A small reliability and usability release that rolls the latest v4.1.2 UI fixes into a clean public build and hardens GitHub release publishing.
+Omni 4.2 turns the local icon browser into a more complete design-and-development workspace. It keeps the fast local search foundation from 4.1 and adds a stronger discovery, sharing, React, preview, and Figma workflow.
 
 ## Highlights
 
-- Exact preview-size field now supports normal typing without clamping mid-entry.
-- Preview slider and exact pixel field stay synchronized and persist the chosen size.
-- Keeps the v4.1.2 capability filtering, stale-server recovery, sidebar icon polish, responsive controls, favorites/recent views, and improved detail drawer.
-- Release workflow now normalizes `VERSION`, prints tag diagnostics, verifies generated archives, and treats reruns of an already-published release safely.
+- **React JSX copy/filter** for every SVG-backed icon.
+- **Shareable deep links** that reopen an exact icon in the local workspace.
+- **Discover shortcuts** for arrows, media, files, commerce, social, developer, and map icons.
+- **Keyboard command guide** with `?`, `R`, `F`, `/`, `C`, `Enter`, and `Esc` workflows.
+- **8–512 px previews** with exact numeric entry and one-click size presets.
+- **Refined visual identity** across the Web UI and Figma plugin.
+- **Improved Figma workflow** with insert-size presets and richer icon metadata.
+- **API revision 4** for the new React capability semantics.
 
 ## Upgrade
 
-Install from the platform release archive or update an existing source checkout:
+From a source checkout:
 
 ```bash
 git pull
 python install.py
-```
-
-Then open Omni:
-
-```bash
 omni-icons open
 ```
+
+For packaged installs, download the correct Windows, macOS, or Linux archive from this release and run its installer.

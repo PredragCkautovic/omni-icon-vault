@@ -11,7 +11,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 from version import version
 
 DEFAULT_PORT=17836
-API_REVISION=3
+API_REVISION=4
 ALIASES={
     'gear':['settings','cog'],'cog':['settings','gear'],'trash':['delete','bin'],'bin':['delete','trash'],
     'photo':['image','picture','camera'],'picture':['image','photo'],'account':['user','person','profile'],
@@ -30,7 +30,8 @@ def icon_format(i):
 def icon_capabilities(i):
     """Return copy/export capabilities backed by real icon data."""
     caps=['id','manifest']
-    if i.get('svg'): caps.append('svg')
+    if i.get('svg'):
+        caps.extend(['svg','react'])
     if i.get('char'): caps.append('glyph')
     if i.get('html'): caps.append('html')
     if i.get('css'): caps.append('css')

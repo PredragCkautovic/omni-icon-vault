@@ -15,7 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PORT = 17836
-EXPECTED_API_REVISION = 3
+EXPECTED_API_REVISION = 4
 
 
 def system_name() -> str:

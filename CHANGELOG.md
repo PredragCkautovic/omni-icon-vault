@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.2.0 — Flagship workspace release
+
+- Added Web UI discovery shortcuts for common icon families and faster browsing.
+- Added React JSX as a first-class copy/filter capability for SVG-backed icons.
+- Added deep-linkable icon details and one-click share links.
+- Added keyboard shortcut/help overlay plus `?`, `R`, and `F` shortcuts.
+- Expanded preview sizing from 8–512 px and added common size presets.
+- Refined branding, empty states, onboarding, card interactions, and responsive layout.
+- Polished the Figma plugin with size presets and richer selected-icon metadata.
+- Bumped the localhost API compatibility revision to 4 for new capability semantics.
+- Refreshed public README/release presentation and documentation.
+
 ## 4.1.3
 
 - Fixed exact preview-size typing so the field is not clamped or rewritten mid-entry.

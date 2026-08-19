@@ -9,14 +9,14 @@
   <link rel="stylesheet" href="../vendor/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="../vendor/bootstrap/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="fonts.css">
-  <link rel="stylesheet" href="style.css?v=4.1.3">
+  <link rel="stylesheet" href="style.css?v=4.2.0">
 </head>
 <body>
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
     <div class="brand-row">
       <button class="brand-mark" id="homeButton" aria-label="Show all icons">
-        <span class="brand-diamond">◇</span>
+        <span class="brand-glyph" aria-hidden="true"><span></span></span>
       </button>
       <div class="brand-copy">
         <strong>Omni Icon Vault</strong>
@@ -67,7 +67,8 @@
         <button id="clearSearch" class="search-clear hidden" aria-label="Clear search">×</button>
         <kbd>/</kbd>
       </div>
-      <button class="top-action" id="randomIcon" title="Open a random icon">Random</button>
+      <button class="top-action" id="randomIcon" title="Open a random icon">Surprise me</button>
+      <button class="icon-button" id="shortcutButton" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">?</button>
       <button class="icon-button" id="themeButton" title="Change theme" aria-label="Change theme">◐</button>
     </header>
 
@@ -84,6 +85,7 @@
           <option value="glyph">Glyph only</option>
           <option value="html">HTML only</option>
           <option value="css">CSS only</option>
+          <option value="react">React JSX only</option>
           <option value="id">Canonical ID</option>
           <option value="manifest">Manifest entry</option>
         </select></label>
@@ -97,6 +99,19 @@
           <button data-density="comfortable" class="active" title="Comfortable grid">▦</button>
           <button data-density="large" title="Large grid">▣</button>
         </div>
+      </div>
+    </section>
+
+    <section class="discover-strip" id="discoverStrip" aria-label="Discover icons">
+      <div class="discover-copy"><span>DISCOVER</span><strong>Jump into a collection</strong></div>
+      <div class="discover-chips">
+        <button data-query="arrow">↗ <span>Arrows</span></button>
+        <button data-query="media">▶ <span>Media</span></button>
+        <button data-query="file folder">▱ <span>Files</span></button>
+        <button data-query="shopping cart">◌ <span>Commerce</span></button>
+        <button data-query="social brand">@ <span>Social</span></button>
+        <button data-query="code terminal">&lt;/&gt; <span>Developer</span></button>
+        <button data-query="map location">⌖ <span>Maps</span></button>
       </div>
     </section>
 
@@ -131,6 +146,7 @@
       <h2>No matching icons</h2>
       <p>Try a broader search, another pack, or remove the format filter.</p>
       <button class="primary-button" id="resetFilters">Reset filters</button>
+      <div class="empty-suggestions"><button data-query="arrow">Arrows</button><button data-query="home">Home</button><button data-query="github">GitHub</button><button data-query="camera">Camera</button></div>
     </section>
 
     <div class="loading-row hidden" id="loadingRow"><span></span><span></span><span></span></div>
@@ -155,9 +171,9 @@
   <div class="preview-controls">
     <label class="preview-size-control">
       <span>Size</span>
-      <input id="previewSize" type="range" min="24" max="180" step="1" value="96" aria-label="Preview size slider">
+      <input id="previewSize" type="range" min="8" max="512" step="1" value="96" aria-label="Preview size slider">
       <span class="preview-size-field">
-        <input id="previewSizeInput" type="number" min="24" max="180" step="1" value="96" inputmode="numeric" aria-label="Exact preview size in pixels">
+        <input id="previewSizeInput" type="number" min="8" max="512" step="1" value="96" inputmode="numeric" aria-label="Exact preview size in pixels">
         <span>px</span>
       </span>
     </label>
@@ -167,6 +183,7 @@
       <button data-bg="light" title="Light background"></button>
       <button data-bg="transparent" title="Transparent grid"></button>
     </div>
+    <div class="size-presets" id="sizePresets" aria-label="Preview size presets"><button data-size="16">16</button><button data-size="24">24</button><button data-size="32">32</button><button data-size="48">48</button><button data-size="64">64</button><button data-size="96">96</button><button data-size="128">128</button><button data-size="256">256</button></div>
   </div>
 
   <div class="detail-info-grid">
@@ -184,6 +201,7 @@
     <button data-copy="svg" id="svgCopyButton"><span>◇</span><b>Copy SVG</b><small>Editable vector</small></button>
     <button data-copy="html" id="htmlCopyButton"><span>&lt;/&gt;</span><b>Copy HTML</b><small>Web markup</small></button>
     <button data-copy="css" id="cssCopyButton"><span>#</span><b>Copy CSS</b><small>CSS snippet</small></button>
+    <button data-copy="react" id="reactCopyButton"><span>R</span><b>Copy React</b><small>JSX component</small></button>
     <button data-copy="glyph" id="glyphCopyButton"><span>A</span><b>Copy glyph</b><small>Font character</small></button>
     <button data-copy="manifest"><span>{ }</span><b>Manifest entry</b><small>Project sync</small></button>
   </div>
@@ -191,6 +209,7 @@
   <div class="drawer-footer-actions">
     <button id="favoriteButton">☆ Add to favorites</button>
     <button id="downloadButton">↓ Download asset</button>
+    <button id="shareButton">↗ Copy deep link</button>
   </div>
 
   <details class="advanced-details">
@@ -202,6 +221,20 @@
   </details>
 </aside>
 
-<script src="app.js?v=4.1.3"></script>
+
+<div class="modal-shell hidden" id="shortcutModal" role="dialog" aria-modal="true" aria-labelledby="shortcutTitle">
+  <div class="modal-card">
+    <div class="modal-head"><div><div class="eyebrow">OMNI COMMANDS</div><h2 id="shortcutTitle">Keyboard shortcuts</h2></div><button class="icon-button" id="closeShortcutModal" aria-label="Close shortcuts">×</button></div>
+    <div class="shortcut-grid">
+      <div><kbd>/</kbd><span>Focus search</span></div><div><kbd>Ctrl K</kbd><span>Focus search</span></div>
+      <div><kbd>Enter</kbd><span>Open first / focused icon</span></div><div><kbd>C</kbd><span>Copy focused icon</span></div>
+      <div><kbd>R</kbd><span>Surprise me</span></div><div><kbd>?</kbd><span>Open this guide</span></div>
+      <div><kbd>Esc</kbd><span>Close details or dialogs</span></div><div><kbd>F</kbd><span>Toggle favorite in details</span></div>
+    </div>
+    <div class="modal-note">Tip: icon detail links are shareable. Use <b>Copy deep link</b> to return to the exact icon later.</div>
+  </div>
+</div>
+
+<script src="app.js?v=4.2.0"></script>
 </body>
 </html>

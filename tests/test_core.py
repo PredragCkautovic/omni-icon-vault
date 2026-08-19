@@ -33,7 +33,7 @@ class CoreTests(unittest.TestCase):
         v=(ROOT/'VERSION').read_text().strip()
         manifest=json.loads((ROOT/'manifest.json').read_text())
         self.assertEqual(v,manifest['version'])
-        self.assertEqual(v,'4.1.3')
+        self.assertEqual(v,'4.2.0')
 
     def test_sources_are_pinned_and_unique(self):
         cfg=json.loads((ROOT/'sources.json').read_text())
@@ -188,14 +188,14 @@ class CoreTests(unittest.TestCase):
 
     def test_server_health_has_api_revision_and_browser_assets_no_store(self):
         text=(ROOT/'tools'/'omni_server.py').read_text('utf-8')
-        self.assertIn('API_REVISION=3',text)
+        self.assertIn('API_REVISION=4',text)
         self.assertIn("'apiRevision':API_REVISION",text)
         self.assertIn("self.path.startswith('/browser/')",text)
 
     def test_platform_restarts_stale_api_revision(self):
         self.assertFalse(platform_utils.health_is_compatible({'ok':True,'version':'4.1.2'}))
-        self.assertFalse(platform_utils.health_is_compatible({'ok':True,'apiRevision':2}))
-        self.assertTrue(platform_utils.health_is_compatible({'ok':True,'apiRevision':3}))
+        self.assertFalse(platform_utils.health_is_compatible({'ok':True,'apiRevision':3}))
+        self.assertTrue(platform_utils.health_is_compatible({'ok':True,'apiRevision':4}))
         text=(ROOT/'tools'/'platform_utils.py').read_text('utf-8')
         self.assertIn('stop_server(port)',text)
 
@@ -216,8 +216,35 @@ class CoreTests(unittest.TestCase):
 
     def test_browser_rejects_unapplied_capability_filter(self):
         js=(ROOT/'browser'/'app.js').read_text('utf-8')
-        self.assertIn('REQUIRED_API_REVISION=3',js)
+        self.assertIn('REQUIRED_API_REVISION=4',js)
         self.assertIn('d.appliedFilters?.capability!==state.copyMode',js)
         self.assertIn('page=page.filter(i=>supportsCopy(i,state.copyMode))',js)
+
+    def test_v420_react_capability_and_discovery_ui(self):
+        from omni_server import IconStore
+        html=(ROOT/'browser'/'index.html').read_text('utf-8')
+        js=(ROOT/'browser'/'app.js').read_text('utf-8')
+        self.assertIn('React JSX only',html)
+        self.assertIn('id="discoverStrip"',html)
+        self.assertIn('id="shareButton"',html)
+        self.assertIn('id="shortcutModal"',html)
+        self.assertIn('reactValue',js)
+        with tempfile.TemporaryDirectory() as td:
+            td=Path(td);(td/'browser').mkdir()
+            items=[{'id':'v','source':'tabler','name':'vector','label':'Vector','svg':'<svg></svg>'},{'id':'g','source':'material','name':'glyph','label':'Glyph','char':'x'}]
+            (td/'browser'/'icon-data.json').write_text(json.dumps(items))
+            store=IconStore(td)
+            page,total=store.search('',capability='react')
+            self.assertEqual(total,1);self.assertEqual(page[0]['id'],'v')
+            self.assertIn('react',store.summary(items[0])['capabilities'])
+
+    def test_v420_preview_range_and_figma_presets(self):
+        html=(ROOT/'browser'/'index.html').read_text('utf-8')
+        js=(ROOT/'browser'/'app.js').read_text('utf-8')
+        figma=(ROOT/'figma-plugin'/'ui.html').read_text('utf-8')
+        self.assertIn('min="8" max="512"',html)
+        self.assertIn('PREVIEW_SIZE_MIN=8,PREVIEW_SIZE_MAX=512',js)
+        self.assertIn('id="sizePresets"',html)
+        self.assertIn('id="figmaSizePresets"',figma)
 
 if __name__=='__main__':unittest.main()

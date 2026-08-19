@@ -1,4 +1,4 @@
-# Web UI
+# Web UI — 4.2 workspace
 
 Omni Icon Vault 4.1 ships an API-driven local browser designed for large icon collections.
 
@@ -87,3 +87,21 @@ The theme button cycles through Dark, Light and System. Preferences are stored l
 Version 4.0 loaded the full generated `icon-data.js` into the page. Version 4.1 queries the local API in pages. This keeps initial browser load and DOM size bounded even when many icon packs are installed.
 
 The browser requests vector previews only for the current page. Full icon records are fetched only when a detail/copy action needs them.
+
+
+## New in 4.2
+
+### Discover shortcuts
+Use the Discover row to jump into common families such as arrows, media, files, commerce, social, developer, and maps. These are ordinary searches, so every normal source/format/copy filter still applies.
+
+### React JSX copy
+SVG-backed icons can now be filtered and copied as React JSX from the Web UI. Choose **React JSX only** in Copy / filter, or use **Copy React** in the detail drawer.
+
+### Deep links
+Open an icon and choose **Copy deep link**. The generated localhost URL includes the canonical icon ID and restores that exact detail view when opened on a machine with the icon installed.
+
+### Preview sizes
+The preview now accepts any whole number from 8 through 512 px, plus common one-click presets.
+
+### Keyboard commands
+Press `?` for the in-app shortcut guide. `R` opens a random matching icon and `F` toggles the current detail icon as a favorite.

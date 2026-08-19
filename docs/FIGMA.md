@@ -20,7 +20,7 @@ omni-icons figma
 
 which starts the server and prints the manifest location.
 
-## v4.1 plugin workflow
+## v4.2 plugin workflow
 
 The plugin now provides:
 
@@ -28,9 +28,9 @@ The plugin now provides:
 - UI / brand / developer / favorites tabs
 - individual source-pack filtering
 - SVG / font / raster filters
-- insert-size control
+- exact insert-size control plus 16 / 24 / 32 / 48 / 64 / 96 / 128 px presets
 - local Figma favorites
-- a selected-icon preview panel
+- a selected-icon preview panel with source, style and representation metadata
 - direct Insert and Copy Icon ID actions
 - double-click insertion from the result grid
 
