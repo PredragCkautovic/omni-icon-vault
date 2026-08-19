@@ -153,7 +153,14 @@
   </div>
 
   <div class="preview-controls">
-    <label>Size <input id="previewSize" type="range" min="24" max="180" value="96"><output id="previewSizeValue">96</output></label>
+    <label class="preview-size-control">
+      <span>Size</span>
+      <input id="previewSize" type="range" min="24" max="180" step="1" value="96" aria-label="Preview size slider">
+      <span class="preview-size-field">
+        <input id="previewSizeInput" type="number" min="24" max="180" step="1" value="96" inputmode="numeric" aria-label="Exact preview size in pixels">
+        <span>px</span>
+      </span>
+    </label>
     <label>Color <input id="previewColor" type="color" value="#f5f3ff"></label>
     <div class="preview-backgrounds" id="previewBackgrounds">
       <button class="active" data-bg="dark" title="Dark background"></button>
@@ -195,6 +202,6 @@
   </details>
 </aside>
 
-<script src="app.js?v=4.1.2-sidebar-r2"></script>
+<script src="app.js?v=4.1.2-size-input-r2"></script>
 </body>
 </html>

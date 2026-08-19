@@ -1,0 +1,8 @@
+Omni Icon Vault 4.1.2 — exact-size typing fix
+
+Behavior:
+- Focusing the numeric field selects the current value.
+- While typing, the field is never clamped or rewritten mid-entry.
+- Valid in-range values update the preview live without rewriting the field.
+- Enter, blur, or change commits and clamps to 24–180 px.
+- Escape cancels the in-progress edit and restores the slider value.

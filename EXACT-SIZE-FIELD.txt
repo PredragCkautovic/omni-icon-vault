@@ -1,0 +1,13 @@
+Omni Icon Vault v4.1.2 — Exact Preview Size Field
+
+Changes:
+- Adds an editable numeric px field beside the preview Size slider.
+- Slider and number field stay synchronized both ways.
+- Exact values are clamped to the current 24–180 px preview range.
+- Arrow keys work in the number field; Enter applies and unfocuses it.
+- The chosen preview size persists in localStorage between sessions.
+- No API/index/filter logic is changed.
+
+Apply over the repository root, then run:
+  chmod +x APPLY_EXACT_SIZE_FIELD.sh
+  ./APPLY_EXACT_SIZE_FIELD.sh
