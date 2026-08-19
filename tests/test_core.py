@@ -22,7 +22,7 @@ class CoreTests(unittest.TestCase):
         v=(ROOT/'VERSION').read_text().strip()
         manifest=json.loads((ROOT/'manifest.json').read_text())
         self.assertEqual(v,manifest['version'])
-        self.assertEqual(v,'4.0.0')
+        self.assertEqual(v,'4.1.0')
 
     def test_sources_are_pinned_and_unique(self):
         cfg=json.loads((ROOT/'sources.json').read_text())
@@ -48,6 +48,11 @@ class CoreTests(unittest.TestCase):
         self.assertNotIn('evil.test',clean)
         self.assertIn('path',clean)
 
+    def test_svg_sanitizer_keeps_safe_presentation_style(self):
+        raw=b'<svg xmlns="http://www.w3.org/2000/svg"><path style="fill:#663399;stroke:none" d="M0 0h1v1z"/></svg>'
+        clean=sanitize_svg(raw).decode()
+        self.assertIn('fill:#663399',clean)
+
     def test_zip_path_traversal_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             td=Path(td);z=td/'bad.zip'
@@ -63,7 +68,55 @@ class CoreTests(unittest.TestCase):
         xs=omni_cli.search(items,'github','kind:brand',20)
         self.assertEqual({x['id'] for x in xs},{'a','b'})
 
+    def test_cli_format_filter_and_sort(self):
+        items=[
+            {'id':'b','name':'beta','label':'Beta','kind':'ui','source':'tabler','sourceLabel':'Tabler','char':'x'},
+            {'id':'a','name':'alpha','label':'Alpha','kind':'ui','source':'lucide','sourceLabel':'Lucide','svg':'<svg/>'},
+        ]
+        xs=omni_cli.search(items,'','all',20,'svg','name')
+        self.assertEqual([x['id'] for x in xs],['a'])
+
+    def test_macos_bundle_version_is_dynamic(self):
+        text=(ROOT/'install.py').read_text('utf-8')
+        self.assertIn('CFBundleVersion</key><string>{version()}</string>',text)
+
     def test_platform_url_is_localhost(self):
         self.assertEqual(platform_utils.app_url(17836),'http://localhost:17836')
+
+    def test_browser_is_api_driven(self):
+        html=(ROOT/'browser'/'index.html').read_text('utf-8')
+        js=(ROOT/'browser'/'app.js').read_text('utf-8')
+        self.assertNotIn('icon-data.js',html)
+        self.assertIn('/api/search',js)
+        self.assertIn('/api/stats',js)
+
+    def test_browser_javascript_ids_exist_in_html(self):
+        import re
+        html=(ROOT/'browser'/'index.html').read_text('utf-8')
+        js=(ROOT/'browser'/'app.js').read_text('utf-8')
+        refs=set(re.findall(r"\$\('#([A-Za-z0-9_-]+)'\)",js))
+        ids=set(re.findall(r'id="([A-Za-z0-9_-]+)"',html))
+        self.assertFalse(refs-ids, f'missing browser element ids: {sorted(refs-ids)}')
+
+    def test_server_search_pagination_format_and_stats(self):
+        from omni_server import IconStore
+        with tempfile.TemporaryDirectory() as td:
+            td=Path(td);(td/'browser').mkdir()
+            items=[
+                {'id':'a','source':'tabler','sourceLabel':'Tabler','kind':'ui','name':'camera','label':'Camera','style':'outline','svg':'<svg/>'},
+                {'id':'b','source':'material','sourceLabel':'Material','kind':'ui','name':'camera','label':'Camera Material','style':'outlined','char':'x'},
+                {'id':'c','source':'simpleicons','sourceLabel':'Simple Icons','kind':'brand','name':'github','label':'GitHub','style':'brand','svg':'<svg/>'},
+            ]
+            (td/'browser'/'icon-data.json').write_text(json.dumps(items))
+            (td/'browser'/'source-meta.json').write_text(json.dumps([{'source':'tabler','label':'Tabler','kind':'ui','count':1}]))
+            store=IconStore(td)
+            page,total=store.search('camera','all','svg','name',0,1)
+            self.assertEqual(total,1);self.assertEqual(page[0]['id'],'a')
+            self.assertEqual(store.stats['formats']['svg'],2)
+            self.assertEqual(store.stats['formats']['font'],1)
+
+    def test_custom_svg_index_uses_sanitizer(self):
+        text=(ROOT/'tools'/'build-index.py').read_text('utf-8')
+        self.assertIn('read_svg(p, sanitize=True)',text)
 
 if __name__=='__main__':unittest.main()

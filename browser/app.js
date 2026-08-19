@@ -1,18 +1,162 @@
 (()=>{
-const ICONS=Array.isArray(window.ICON_DATA)?window.ICON_DATA:[], META=Array.isArray(window.SOURCE_META)?window.SOURCE_META:[];const PAGE=260;let active='all',shown=PAGE,current=null,filtered=[],toastTimer;const $=s=>document.querySelector(s),grid=$('#grid'),search=$('#search'),details=$('#details'),favorites=new Set(JSON.parse(localStorage.getItem('omniIconFavorites')||'[]'));
-const metaBy=Object.fromEntries(META.map(x=>[x.source,x]));const labelFor=s=>metaBy[s]?.label||s;
-function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function norm(s=''){return String(s).toLowerCase().replace(/[-_]+/g,' ')}function key(i){return i.id||`${i.source}:${i.style||''}:${i.name}`}
-function buildPacks(){const root=$('#packSources');root.innerHTML=META.map(m=>`<button class="source" data-source="${esc(m.source)}"><span>${esc(m.label)}</span><b>${Number(m.count||0).toLocaleString()}</b></button>`).join('')}
-function matchesFilter(i){if(active==='favorites')return favorites.has(key(i));if(active==='kind:brand')return ['brand','favicon'].includes(i.kind);if(active.startsWith('kind:'))return i.kind===active.split(':')[1];if(active!=='all')return i.source===active;return true}
-function getFiltered(){const q=norm(search.value.trim()),parts=q.split(/\s+/).filter(Boolean);return ICONS.filter(i=>matchesFilter(i)&&(!q||parts.every(p=>norm([i.name,i.label,i.style,i.source,i.sourceLabel,i.kind,i.url,(i.terms||[]).join(' ')].join(' ')).includes(p))))}
-function iconHtml(i,extra=''){if(i.svg)return `<span class="svg-icon render-${esc(i.render||'auto')} ${extra}">${i.svg}</span>`;if(i.raster)return `<img class="raster-icon ${extra}" src="${esc(i.raster)}" alt="">`;if(i.source==='material')return `<span class="material-icon ${extra}">${esc(i.char||'')}</span>`;if(i.source==='nerdfonts')return `<span class="nerd-icon ${extra}">${esc(i.char||'')}</span>`;return `<span class="glyph-icon ${extra}">${esc(i.char||'')}</span>`}
-function titleFor(){if(active==='all')return'All icons';if(active==='favorites')return'Favorites';if(active==='kind:ui')return'UI icons';if(active==='kind:brand')return'Brands + Favicons';if(active==='kind:developer')return'Developer icons';return labelFor(active)}
-function render(){filtered=getFiltered();const part=filtered.slice(0,shown);grid.innerHTML=part.map((i,n)=>`<article class="icon-card" data-idx="${n}"><span class="kind-pill">${esc(i.kind||'icon')}</span><button class="more" data-detail="${n}">⋯</button><div class="icon">${iconHtml(i)}</div><div class="name">${esc(i.label||i.name)}</div><div class="pack">${esc(labelFor(i.source))}</div></article>`).join('');$('#viewTitle').textContent=titleFor();$('#resultText').textContent=`${filtered.length.toLocaleString()} icons${search.value.trim()?` matching “${search.value.trim()}”`:''}`;$('#empty').classList.toggle('hidden',!!filtered.length);$('#loadMore').classList.toggle('hidden',shown>=filtered.length||!filtered.length)}
-async function copy(text,label='Copied'){if(!text){toast('Not available for this icon');return}try{await navigator.clipboard.writeText(text)}catch{const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}toast(label)}function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove('show'),1300)}
-function smart(i){return i.svg?'svg':i.raster?'asset':(i.source==='material'?'html':'glyph')}function val(i,m){if(m==='smart')m=smart(i);if(m==='id')return key(i);if(m==='svg')return i.svg||'';if(m==='glyph')return i.char||'';if(m==='html')return i.html||i.char||'';if(m==='css')return i.css||'';if(m==='asset')return i.raster||'';return''}
-grid.addEventListener('click',e=>{const b=e.target.closest('[data-detail]');if(b){e.stopPropagation();open(filtered[+b.dataset.detail]);return}const c=e.target.closest('.icon-card');if(!c)return;const i=filtered[+c.dataset.idx],m=$('#copyMode').value;copy(val(i,m),`Copied ${m==='smart'?smart(i):m}`)});$('#sourceList').addEventListener('click',e=>{const b=e.target.closest('[data-source]');if(!b)return;active=b.dataset.source;shown=PAGE;document.querySelectorAll('.source').forEach(x=>x.classList.toggle('active',x===b));render()});search.addEventListener('input',()=>{shown=PAGE;render()});$('#clearSearch').onclick=()=>{search.value='';shown=PAGE;search.focus();render()};$('#loadMore').onclick=()=>{shown+=PAGE;render()};$('#randomIcon').onclick=()=>filtered.length&&open(filtered[Math.floor(Math.random()*filtered.length)]);
-function open(i){current=i;$('#detailPreview').innerHTML=iconHtml(i);$('#detailSource').textContent=`${labelFor(i.source)}${i.style?' · '+i.style:''} · ${i.kind||'icon'}`;$('#detailName').textContent=i.label||i.name;$('#detailCode').textContent=i.raster?'Raster favicon / image asset':(i.code?`Unicode U+${String(i.code).toUpperCase()}`:(i.svg?'Editable SVG vector':'Font glyph'));$('#idValue').textContent=key(i);$('#glyphValue').textContent=i.char||'Not available';$('#htmlValue').textContent=i.html||'Not available';$('#cssValue').textContent=i.css||'Not available';$('#svgCopyButton').disabled=!i.svg;$('#glyphCopyButton').disabled=!i.char;$('#assetCopyButton').disabled=!i.raster;$('#assetValue').textContent=i.raster||'Not a raster asset';const f=$('#favoriteButton'),on=favorites.has(key(i));f.textContent=on?'★ Remove from favorites':'☆ Add to favorites';f.classList.toggle('on',on);details.showModal()}
-$('#closeDialog').onclick=()=>details.close();document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>current&&copy(val(current,b.dataset.copy),`Copied ${b.dataset.copy}`));$('#favoriteButton').onclick=()=>{if(!current)return;favorites.has(key(current))?favorites.delete(key(current)):favorites.add(key(current));localStorage.setItem('omniIconFavorites',JSON.stringify([...favorites]));counts();open(current);render()};
-function counts(){const kinds={ui:0,brand:0,developer:0,favicon:0};ICONS.forEach(i=>kinds[i.kind]=(kinds[i.kind]||0)+1);$('#count-all').textContent=ICONS.length.toLocaleString();$('#count-ui').textContent=(kinds.ui||0).toLocaleString();$('#count-brand').textContent=((kinds.brand||0)+(kinds.favicon||0)).toLocaleString();$('#count-developer').textContent=(kinds.developer||0).toLocaleString();$('#count-favorites').textContent=favorites.size.toLocaleString()}
-document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==search){e.preventDefault();search.focus()}if(e.key==='Escape'&&details.open)details.close()});buildPacks();counts();render();
+'use strict';
+const API=location.origin;
+const PAGE_SIZE=120;
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const migratedFavorites=(()=>{const current=readArray('omniFavorites');if(current.length)return current;const legacy=readArray('omniIconFavorites');if(legacy.length)saveArray('omniFavorites',legacy);return legacy})();
+const state={
+  source:'all',format:'all',sort:localStorage.getItem('omniSort')||'relevance',density:localStorage.getItem('omniDensity')||'comfortable',copyMode:localStorage.getItem('omniCopyMode')||'smart',
+  query:'',offset:0,total:0,items:[],current:null,loading:false,request:0,
+  favorites:new Set(migratedFavorites),recent:readArray('omniRecent').slice(0,60),
+  sources:[],stats:null,theme:localStorage.getItem('omniTheme')||'dark'
+};
+const previewCache=new Map();
+let toastTimer=0,searchTimer=0;
+
+function readArray(key){try{const v=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(v)?v:[]}catch{return[]}}
+function saveArray(key,v){localStorage.setItem(key,JSON.stringify(v))}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function human(n){return Number(n||0).toLocaleString()}
+function key(i){return i?.id||''}
+function formatOf(i){if(i?.svg||i?.figmaType==='svg')return'svg';if(i?.raster||i?.figmaType==='raster')return'raster';return'font'}
+function labelFormat(i){return formatOf(i)==='svg'?'SVG':formatOf(i)==='raster'?'IMG':'FONT'}
+function smart(i){return i?.svg?'svg':i?.raster?'asset':i?.char?'glyph':'id'}
+function manifestValue(i){return JSON.stringify({id:key(i),as:pascal(i?.name||i?.label||'Icon')},null,2)}
+function pascal(s){return String(s||'Icon').replace(/[^a-zA-Z0-9]+(.)?/g,(_,c)=>c?c.toUpperCase():'').replace(/^./,c=>c.toUpperCase())||'Icon'}
+function value(i,mode){if(!i)return'';if(mode==='smart')mode=smart(i);if(mode==='id')return key(i);if(mode==='manifest')return manifestValue(i);if(mode==='svg')return i.svg||'';if(mode==='glyph')return i.char||'';if(mode==='html')return i.html||i.svg||i.char||'';if(mode==='css')return i.css||'';if(mode==='asset')return i.raster||'';return''}
+function toast(text){const el=$('#toast');el.textContent=text;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1500)}
+async function copy(text,label='Copied'){if(!text){toast('That format is not available');return false}try{await navigator.clipboard.writeText(text)}catch{const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}toast(label);return true}
+function setOnline(ok,text){$('#statusDot').classList.toggle('online',!!ok);$('#statusDot').classList.toggle('offline',!ok);$('#serverStatus').textContent=text|| (ok?'Local server connected':'Local server offline')}
+function sourceLabel(source){return state.sources.find(x=>x.source===source)?.label||source}
+function titleFor(){if(state.source==='all')return'All icons';if(state.source==='favorites')return'Favorites';if(state.source==='recent')return'Recently used';if(state.source==='kind:ui')return'UI icons';if(state.source==='kind:brand')return'Brands + favicons';if(state.source==='kind:developer')return'Developer icons';return sourceLabel(state.source)}
+function setTheme(theme){state.theme=theme;document.documentElement.dataset.theme=theme==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):theme;localStorage.setItem('omniTheme',theme);$('#themeButton').textContent=theme==='dark'?'◐':theme==='light'?'☀':'◒'}
+function cycleTheme(){setTheme(state.theme==='dark'?'light':state.theme==='light'?'system':'dark');toast(`Theme: ${state.theme}`)}
+function applyDensity(){const g=$('#grid');g.dataset.density=state.density;$$('[data-density]').forEach(b=>b.classList.toggle('active',b.dataset.density===state.density))}
+function updateUrl(){const u=new URL(location.href);state.query?u.searchParams.set('q',state.query):u.searchParams.delete('q');state.source!=='all'?u.searchParams.set('source',state.source):u.searchParams.delete('source');history.replaceState(null,'',u)}
+function initFromUrl(){const u=new URL(location.href);state.query=u.searchParams.get('q')||'';state.source=u.searchParams.get('source')||'all';$('#search').value=state.query}
+
+async function fetchJson(url){const r=await fetch(url,{cache:'no-store'});const d=await r.json();if(!r.ok||d.ok===false)throw new Error(d.error||`HTTP ${r.status}`);return d}
+async function loadBootstrap(){
+  try{
+    const [health,sources,stats]=await Promise.all([fetchJson(`${API}/api/health`),fetchJson(`${API}/api/sources`),fetchJson(`${API}/api/stats`)]);
+    setOnline(true,`Omni ${health.version}`);$('#versionLabel').textContent=`v${health.version} · local workspace`;state.sources=sources.sources||[];state.stats=stats;
+    buildSources();renderStats();syncCounts();$('#footerMeta').textContent=`v${health.version} · ${human(health.icons)} indexed`;
+  }catch(err){
+    setOnline(false,'Server unavailable');$('#resultText').textContent='Could not reach the local API. Run: omni-icons start';$('#grid').innerHTML=offlineCard(err);return false;
+  }
+  return true;
+}
+function offlineCard(err){return `<article class="icon-card" style="grid-column:1/-1;min-height:190px"><div class="card-icon">!</div><div class="card-name">Local server is not running</div><div class="card-meta">Run <code>omni-icons start</code> then refresh · ${esc(err?.message||'')}</div></article>`}
+function buildSources(){
+  const root=$('#packSources');root.innerHTML=state.sources.map(m=>`<button class="nav-item" data-source="${esc(m.source)}"><span class="nav-icon">·</span><span>${esc(m.label)}</span><b>${human(m.count)}</b></button>`).join('');
+  syncActiveNav();
+}
+function renderStats(){const s=state.stats||{};$('#statUi').textContent=human(s.kinds?.ui);$('#statBrand').textContent=human((s.kinds?.brand||0)+(s.kinds?.favicon||0));$('#statDeveloper').textContent=human(s.kinds?.developer);$('#statSources').textContent=human(s.sourceCount||state.sources.length);$('#statTotal').textContent=human(s.total)}
+function syncCounts(){const k=state.stats?.kinds||{};$('#count-all').textContent=human(state.stats?.total);$('#count-ui').textContent=human(k.ui);$('#count-brand').textContent=human((k.brand||0)+(k.favicon||0));$('#count-developer').textContent=human(k.developer);$('#count-favorites').textContent=human(state.favorites.size);$('#count-recent').textContent=human(state.recent.length)}
+function syncActiveNav(){$$('#sourceList [data-source]').forEach(b=>b.classList.toggle('active',b.dataset.source===state.source))}
+
+async function loadSpecialIds(ids){
+  const filtered=ids.filter(Boolean).slice(0,1000);if(!filtered.length)return[];const out=[];
+  for(let n=0;n<filtered.length;n+=100){const chunk=filtered.slice(n,n+100);const d=await fetchJson(`${API}/api/batch?ids=${encodeURIComponent(chunk.join(','))}&include=preview`);out.push(...(d.items||[]))}
+  const by=new Map(out.map(i=>[i.id,i]));return filtered.map(id=>by.get(id)).filter(Boolean);
+}
+function clientSpecialFilter(items){
+  const q=state.query.trim().toLowerCase();let xs=items;
+  if(state.format!=='all')xs=xs.filter(i=>formatOf(i)===state.format);
+  if(q){const toks=q.split(/\s+/).filter(Boolean);xs=xs.filter(i=>{const h=[i.id,i.name,i.label,i.source,i.sourceLabel,i.style,i.kind,...(i.terms||[])].join(' ').toLowerCase();return toks.every(t=>h.includes(t))})}
+  if(state.sort==='name')xs.sort((a,b)=>(a.label||a.name||'').localeCompare(b.label||b.name||''));
+  if(state.sort==='pack')xs.sort((a,b)=>(a.sourceLabel||a.source||'').localeCompare(b.sourceLabel||b.source||'')||(a.label||'').localeCompare(b.label||''));
+  return xs;
+}
+async function search(reset=true){
+  if(state.loading&&reset)state.request++;
+  const request=++state.request;state.loading=true;$('#loadingRow').classList.remove('hidden');$('#loadMore').classList.add('hidden');
+  if(reset){state.offset=0;state.items=[];$('#grid').innerHTML=''}
+  state.query=$('#search').value.trim();updateUrl();$('#clearSearch').classList.toggle('hidden',!state.query);$('#viewTitle').textContent=titleFor();$('#viewEyebrow').textContent=state.source==='favorites'?'YOUR COLLECTION':state.source==='recent'?'RECENT ACTIVITY':'LOCAL LIBRARY';
+  try{
+    let page=[],total=0;
+    if(state.source==='favorites'||state.source==='recent'){
+      const ids=state.source==='favorites'?[...state.favorites]:state.recent;let xs=clientSpecialFilter(await loadSpecialIds(ids));total=xs.length;page=xs.slice(state.offset,state.offset+PAGE_SIZE);
+    }else{
+      const p=new URLSearchParams({q:state.query,source:state.source,format:state.format,sort:state.sort,offset:String(state.offset),limit:String(PAGE_SIZE),include:'preview'});
+      const d=await fetchJson(`${API}/api/search?${p}`);page=d.items||[];total=d.total??page.length;
+    }
+    if(request!==state.request)return;
+    state.items=reset?page:[...state.items,...page];state.total=total;renderGrid();state.offset=state.items.length;
+    $('#resultText').textContent=`${human(total)} icon${total===1?'':'s'}${state.query?` matching “${state.query}”`:''}`;
+    $('#loadMore').classList.toggle('hidden',state.items.length>=total||!total);$('#empty').classList.toggle('hidden',!!total);setOnline(true);
+  }catch(err){if(request===state.request){setOnline(false,'Search API error');$('#resultText').textContent=err.message;toast('Search failed')}}
+  finally{if(request===state.request){state.loading=false;$('#loadingRow').classList.add('hidden')}}
+}
+function cardPreview(i){
+  if(i.svg)return `<span class="card-icon render-${esc(i.render||'auto')}">${i.svg}</span>`;
+  if(i.raster)return `<span class="card-icon"><img class="raster-icon" src="${esc(i.raster)}" alt=""></span>`;
+  if(i.source==='material')return `<span class="card-icon material-icon">${esc(i.char||'')}</span>`;
+  if(i.source==='nerdfonts')return `<span class="card-icon nerd-icon">${esc(i.char||'')}</span>`;
+  return `<span class="card-icon">${esc(i.char||'◇')}</span>`;
+}
+function renderGrid(){
+  const g=$('#grid');applyDensity();g.innerHTML=state.items.map((i,n)=>{
+    const fav=state.favorites.has(key(i));return `<article class="icon-card" tabindex="0" data-index="${n}" title="${esc(key(i))}">
+      <span class="card-kind">${esc(i.kind||'icon')}</span>
+      <div class="card-actions"><button data-action="favorite" class="${fav?'favorite-on':''}" title="Favorite">${fav?'★':'☆'}</button><button data-action="detail" title="Details">•••</button></div>
+      ${cardPreview(i)}
+      <div class="card-name">${esc(i.label||i.name)}</div>
+      <div class="card-meta">${esc(i.sourceLabel||sourceLabel(i.source))}${i.style?` · ${esc(i.style)}`:''}</div>
+      <span class="format-badge">${labelFormat(i)}</span>
+    </article>`
+  }).join('');
+}
+
+async function ensureFull(i){if(!i)return null;if(i.svg!==undefined&&i.html!==undefined)return i;if(previewCache.has(key(i)))return previewCache.get(key(i));const d=await fetchJson(`${API}/api/icon?id=${encodeURIComponent(key(i))}`);previewCache.set(key(i),d.icon);return d.icon}
+function remember(i){const id=key(i);if(!id)return;state.recent=[id,...state.recent.filter(x=>x!==id)].slice(0,60);saveArray('omniRecent',state.recent);syncCounts()}
+async function openDetails(item){
+  try{const i=await ensureFull(item);state.current=i;remember(i);$('#detailSource').textContent=`${i.kind||'icon'} · ${i.sourceLabel||sourceLabel(i.source)}`.toUpperCase();$('#detailName').textContent=i.label||i.name;$('#detailPack').textContent=i.sourceLabel||sourceLabel(i.source);$('#detailStyle').textContent=i.style||'Default';$('#detailType').textContent=formatOf(i)==='svg'?'Editable SVG':formatOf(i)==='raster'?'Raster image':'Font glyph';$('#detailCode').textContent=i.code?`U+${String(i.code).toUpperCase()}`:'—';$('#idValue').textContent=key(i);$('#htmlValue').textContent=i.html||'Not available';$('#cssValue').textContent=i.css||'Not available';$('#glyphValue').textContent=i.char||'Not available';$('#urlValue').textContent=i.url||'—';$('#smartFormatLabel').textContent=smart(i).toUpperCase();renderDetailPreview();syncDetailButtons();$('#details').classList.add('open');$('#details').setAttribute('aria-hidden','false');$('#sidebarScrim').classList.remove('hidden') }catch(err){toast(`Could not open icon: ${err.message}`)}
+}
+function renderDetailPreview(){const i=state.current;if(!i)return;let html;if(i.svg)html=`<span class="render-${esc(i.render||'auto')}">${i.svg}</span>`;else if(i.raster)html=`<img class="raster-icon" src="${esc(i.raster)}" alt="">`;else if(i.source==='material')html=`<span class="material-icon">${esc(i.char||'')}</span>`;else if(i.source==='nerdfonts')html=`<span class="nerd-icon">${esc(i.char||'')}</span>`;else html=esc(i.char||'◇');$('#detailPreview').innerHTML=html;applyPreviewControls()}
+function applyPreviewControls(){const size=$('#previewSize').value,color=$('#previewColor').value;$('#previewSizeValue').value=size;$('#previewSizeValue').textContent=size;$('#detailPreview').style.fontSize=`${size}px`;$('#detailPreview').style.color=color}
+function syncDetailButtons(){const i=state.current;$('#svgCopyButton').disabled=!i?.svg;$('#htmlCopyButton').disabled=!i?.html&&!i?.svg&&!i?.char;$('#cssCopyButton').disabled=!i?.css;$('#glyphCopyButton').disabled=!i?.char;const fav=state.favorites.has(key(i));$('#favoriteButton').textContent=fav?'★ Remove favorite':'☆ Add to favorites';$('#favoriteButton').classList.toggle('favorite-on',fav);$('#downloadButton').disabled=!(i?.svg||i?.raster)}
+function closeDetails(){state.current=null;$('#details').classList.remove('open');$('#details').setAttribute('aria-hidden','true');if(!$('#sidebar').classList.contains('open'))$('#sidebarScrim').classList.add('hidden')}
+async function copyFromItem(item,mode){const full=await ensureFull(item);const actual=mode==='smart'?smart(full):mode;const ok=await copy(value(full,mode),`Copied ${actual==='asset'?'asset path':actual}`);if(ok)remember(full)}
+function toggleFavorite(i){const id=key(i);if(!id)return;if(state.favorites.has(id))state.favorites.delete(id);else state.favorites.add(id);saveArray('omniFavorites',[...state.favorites]);syncCounts();if(state.current&&key(state.current)===id)syncDetailButtons();if(state.source==='favorites')search(true);else renderGrid()}
+async function downloadCurrent(){const i=state.current;if(!i)return;if(i.svg){const blob=new Blob([i.svg],{type:'image/svg+xml'});downloadBlob(blob,`${safeFile(i.name||'icon')}.svg`);return}if(i.raster){try{const r=await fetch(i.raster);downloadBlob(await r.blob(),`${safeFile(i.name||'icon')}${extensionFrom(i.raster)}`)}catch{toast('Could not download asset')}}}
+function safeFile(s){return String(s||'icon').replace(/[^a-z0-9._-]+/gi,'-').replace(/^-+|-+$/g,'')||'icon'}
+function extensionFrom(path){const m=String(path).match(/\.(svg|png|webp|jpg|jpeg|ico)(?:\?|$)/i);return m?'.'+m[1].toLowerCase():''}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast(`Downloaded ${name}`)}
+
+function setSource(source){state.source=source;state.offset=0;syncActiveNav();closeMobileSidebar();search(true)}
+function setFormat(fmt){state.format=fmt;$$('[data-format]').forEach(b=>b.classList.toggle('active',b.dataset.format===fmt));search(true)}
+function resetFilters(){state.source='all';state.format='all';state.sort='relevance';$('#sortMode').value='relevance';$('#search').value='';syncActiveNav();$$('[data-format]').forEach(b=>b.classList.toggle('active',b.dataset.format==='all'));search(true)}
+function openMobileSidebar(){$('#sidebar').classList.add('open');$('#sidebarScrim').classList.remove('hidden')}
+function closeMobileSidebar(){$('#sidebar').classList.remove('open');if(!$('#details').classList.contains('open'))$('#sidebarScrim').classList.add('hidden')}
+
+$('#sourceList').addEventListener('click',e=>{const b=e.target.closest('[data-source]');if(b)setSource(b.dataset.source)});
+$('#statStrip').addEventListener('click',e=>{const b=e.target.closest('[data-source]');if(b)setSource(b.dataset.source)});
+$('#grid').addEventListener('click',async e=>{const card=e.target.closest('.icon-card');if(!card)return;const i=state.items[+card.dataset.index];const a=e.target.closest('[data-action]');if(a){e.stopPropagation();if(a.dataset.action==='favorite')toggleFavorite(i);else openDetails(i);return}await copyFromItem(i,$('#copyMode').value)});
+$('#grid').addEventListener('keydown',e=>{const card=e.target.closest('.icon-card');if(!card)return;const idx=+card.dataset.index;if(e.key==='Enter'){e.preventDefault();openDetails(state.items[idx])}if(e.key.toLowerCase()==='c'){e.preventDefault();copyFromItem(state.items[idx],$('#copyMode').value)}});
+$('#search').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>search(true),130)});
+$('#search').addEventListener('keydown',e=>{if(e.key==='Enter'&&state.items[0])openDetails(state.items[0])});
+$('#clearSearch').onclick=()=>{$('#search').value='';search(true);$('#search').focus()};
+$('#randomIcon').onclick=async()=>{try{const source=['favorites','recent'].includes(state.source)?'all':state.source;const d=await fetchJson(`${API}/api/random?source=${encodeURIComponent(source)}&format=${encodeURIComponent(state.format)}`);openDetails(d.icon)}catch{toast('No icon available')}};
+$('#themeButton').onclick=cycleTheme;
+$('#copyMode').onchange=e=>{state.copyMode=e.target.value;localStorage.setItem('omniCopyMode',state.copyMode)};
+$('#sortMode').onchange=e=>{state.sort=e.target.value;localStorage.setItem('omniSort',state.sort);search(true)};
+$('#formatFilters').onclick=e=>{const b=e.target.closest('[data-format]');if(b)setFormat(b.dataset.format)};
+$('#loadMore').onclick=()=>search(false);
+$('#resetFilters').onclick=resetFilters;
+$('#homeButton').onclick=()=>setSource('all');
+$('#copyFaviconCommand').onclick=()=>copy('omni-icons favicon add example.com','Copied favicon command');
+$('#collapsePacks').onclick=()=>{const p=$('#packSources');p.classList.toggle('collapsed');$('#collapsePacks').textContent=p.classList.contains('collapsed')?'+':'−'};
+$$('[data-density]').forEach(b=>b.onclick=()=>{state.density=b.dataset.density;localStorage.setItem('omniDensity',state.density);applyDensity()});
+$('#closeDetails').onclick=closeDetails;$('#sidebarScrim').onclick=()=>{closeDetails();closeMobileSidebar()};$('#openSidebar').onclick=openMobileSidebar;$('#closeSidebar').onclick=closeMobileSidebar;
+$('#previewSize').oninput=applyPreviewControls;$('#previewColor').oninput=applyPreviewControls;
+$('#previewBackgrounds').onclick=e=>{const b=e.target.closest('[data-bg]');if(!b)return;$$('#previewBackgrounds button').forEach(x=>x.classList.toggle('active',x===b));$('#previewStage').className='preview-stage'+(b.dataset.bg==='light'?' light':b.dataset.bg==='transparent'?' transparent':'')};
+$('#details').addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(b&&state.current)copyFromItem(state.current,b.dataset.copy)});
+$('#favoriteButton').onclick=()=>state.current&&toggleFavorite(state.current);$('#downloadButton').onclick=downloadCurrent;
+matchMedia('(prefers-color-scheme: light)').addEventListener?.('change',()=>{if(state.theme==='system')setTheme('system')});
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();$('#search').focus();$('#search').select()}if(e.key==='Escape'){if($('#details').classList.contains('open'))closeDetails();else closeMobileSidebar()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#search').focus();$('#search').select()}});
+
+async function boot(){initFromUrl();setTheme(state.theme);$('#sortMode').value=['relevance','name','pack'].includes(state.sort)?state.sort:'relevance';$('#copyMode').value=['smart','svg','glyph','html','css','id','manifest'].includes(state.copyMode)?state.copyMode:'smart';applyDensity();const ok=await loadBootstrap();if(!ok)return;syncActiveNav();await search(true)}
+boot();
 })();

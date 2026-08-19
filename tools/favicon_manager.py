@@ -122,7 +122,12 @@ def sanitize_svg(raw:bytes)->bytes:
         for k in list(el.attrib):
             lk=local_tag(k)
             v=el.attrib.get(k,'')
-            if lk.startswith('on') or lk in ('style',): el.attrib.pop(k,None); continue
+            if lk.startswith('on'): el.attrib.pop(k,None); continue
+            if lk=='style':
+                # Preserve ordinary local presentation styles, but remove CSS capable of
+                # fetching/embedding remote or executable content.
+                if urlish.search(v) or re.search(r'(?i)(?:expression\s*\(|javascript\s*:|@import|behavior\s*:)',v): el.attrib.pop(k,None)
+                continue
             if lk in ('href','src') and re.match(r'(?i)\s*(?:https?:|//|javascript:)',v): el.attrib.pop(k,None); continue
             if urlish.search(v): el.attrib.pop(k,None)
     clean(root)

@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.1.0 — Workspace UI upgrade
+
+- Rebuilt the local browser as an API-driven, paginated icon workspace.
+- Added category, pack and representation filters plus relevance/name/pack sorting.
+- Added compact, comfortable and large grid-density modes.
+- Added dark, light and system-aware themes.
+- Added Favorites and Recently Used views.
+- Added a detail drawer with live preview size/color/background controls, download actions and project-manifest copying.
+- Added search aliases for common icon vocabulary.
+- Added `/api/stats`, `/api/batch` and `/api/random`; expanded `/api/search` with pagination, sort, format filters and optional previews.
+- Updated the Figma plugin with faster preview loading, favorites, format filters and a selected-icon panel.
+- Sanitized custom SVGs before browser/Figma indexing.
+- Fixed duplicate `README-FIRST.txt` entries in generated release archives.
+- Expanded the automated test suite for the new browser/API behavior.
+
 ## 4.0.0 — Cross-platform stable release
 
 - Replaced Linux-only installation dependencies with a Python standard-library installer.

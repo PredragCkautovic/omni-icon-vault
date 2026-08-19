@@ -22,7 +22,7 @@ Search across UI icons, brand marks, developer glyphs, favicons, and your own SV
   <img alt="Local first" src="https://img.shields.io/badge/runtime-local--first-8b5cf6?style=flat-square">
 </p>
 
-**[Download latest release](https://github.com/PredragCkautovic/omni-icon-vault/releases/latest)** · **[Figma setup](docs/FIGMA.md)** · **[CLI reference](docs/CLI.md)** · **[Architecture](docs/ARCHITECTURE.md)** · **[Contributing](CONTRIBUTING.md)**
+**[Download latest release](https://github.com/PredragCkautovic/omni-icon-vault/releases/latest)** · **[Web UI](docs/WEB_UI.md)** · **[Figma setup](docs/FIGMA.md)** · **[CLI reference](docs/CLI.md)** · **[Architecture](docs/ARCHITECTURE.md)** · **[Contributing](CONTRIBUTING.md)**
 
 </div>
 
@@ -32,7 +32,7 @@ Search across UI icons, brand marks, developer glyphs, favicons, and your own SV
   <img src="docs/assets/omni-hero.png" alt="Omni Icon Vault interface overview" width="100%">
 </p>
 
-<p align="center"><sub>Interface overview. Available packs and icon counts depend on the source versions installed on your machine.</sub></p>
+<p align="center"><sub>Omni workspace concept. Version 4.1 introduces the faster API-driven browser, richer filters, favorites/recent views, responsive layouts, themes, and a full icon detail drawer.</sub></p>
 
 ---
 
@@ -62,6 +62,24 @@ Most projects end up with several disconnected icon workflows: one library in Fi
 - 🗂️ **Custom SVG library** for project-specific or company-specific icon sets.
 - 💻 **Windows, macOS, and Linux** installers with a common CLI.
 - 🐍 **Python 3.10+**, with no Node.js requirement for Omni itself.
+
+### New in 4.1 — faster local icon workspace
+
+Version 4.1 replaces the old full-database browser load with **paginated localhost API search**. The UI stays responsive as your installed icon collection grows and adds a much richer browsing workflow:
+
+- **Favorites + Recently Used** views
+- **UI / brand / developer / pack** navigation
+- **SVG / font / raster** representation filters
+- **Relevance / name / pack** sorting
+- **Compact / comfortable / large** grids
+- **Dark / light / system** themes
+- Search aliases such as `gear → settings`, `trash → delete`, `photo → image`
+- Rich detail drawer with live **size / color / background** preview controls
+- Copy **best format / SVG / glyph / HTML / CSS / canonical ID / manifest entry**
+- Direct SVG/raster downloads
+- Faster Figma previews using the same optimized API
+
+See the **[Web UI guide](docs/WEB_UI.md)** and **[upgrade guide](UPGRADING.md)**.
 
 ---
 
@@ -217,6 +235,9 @@ Useful keyboard shortcuts:
 | Key | Action |
 |---|---|
 | `/` | Focus search |
+| `Ctrl/Cmd + K` | Focus search |
+| `Enter` | Open the first result / focused card |
+| `C` | Copy a focused card with the active copy mode |
 | `Esc` | Close icon details |
 
 ---
@@ -596,17 +617,17 @@ Read these before contributing:
 Releases are tag-driven and the repository includes CI for Windows, macOS, and Linux.
 
 ```bash
-git tag -a v4.0.0 -m "Omni Icon Vault 4.0.0"
-git push origin v4.0.0
+git tag -a v4.1.0 -m "Omni Icon Vault 4.1.0"
+git push origin v4.1.0
 ```
 
 The release pipeline builds:
 
 ```text
-Omni-Icon-Vault-4.0.0-source.zip
-Omni-Icon-Vault-4.0.0-windows.zip
-Omni-Icon-Vault-4.0.0-macos.zip
-Omni-Icon-Vault-4.0.0-linux.zip
+Omni-Icon-Vault-4.1.0-source.zip
+Omni-Icon-Vault-4.1.0-windows.zip
+Omni-Icon-Vault-4.1.0-macos.zip
+Omni-Icon-Vault-4.1.0-linux.zip
 SHA256SUMS.txt
 ```
 

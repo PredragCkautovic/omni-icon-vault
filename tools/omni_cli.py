@@ -31,13 +31,21 @@ def score(i,q):
         if t in terms.lower():s+=15
     return s
 
-def search(items,q,source='all',limit=20):
+def icon_format(i):
+    if i.get('svg'): return 'svg'
+    if i.get('raster'): return 'raster'
+    return 'font'
+
+def search(items,q,source='all',limit=20,fmt='all',sort='relevance'):
     if source.startswith('kind:'):
         kind=source.split(':',1)[1]
         xs=[i for i in items if i.get('kind') in ('brand','favicon')] if kind=='brand' else [i for i in items if i.get('kind')==kind]
     else: xs=items if source in ('','all') else [i for i in items if i.get('source')==source]
+    if fmt not in ('','all'): xs=[i for i in xs if icon_format(i)==fmt]
     ranked=[(score(i,q),i) for i in xs]; ranked=[x for x in ranked if x[0]>0]
-    ranked.sort(key=lambda x:(-x[0],x[1].get('label',''),x[1].get('style','')))
+    if sort=='name': ranked.sort(key=lambda x:(str(x[1].get('label') or x[1].get('name','')).lower(),str(x[1].get('sourceLabel','')).lower()))
+    elif sort=='pack': ranked.sort(key=lambda x:(str(x[1].get('sourceLabel') or x[1].get('source','')).lower(),str(x[1].get('label') or x[1].get('name','')).lower()))
+    else: ranked.sort(key=lambda x:(-x[0],x[1].get('label',''),x[1].get('style','')))
     return [i for _,i in ranked[:max(1,limit)]]
 
 def find_id(items,ref):
@@ -123,7 +131,7 @@ def export_one(i,out:Path,fmt,alias=None):
     raise SystemExit('Unsupported export format: '+fmt)
 
 def cmd_search(a):
-    xs=search(load_items(),a.query,a.source,a.limit)
+    xs=search(load_items(),a.query,a.source,a.limit,a.format,a.sort)
     if a.json:print(json.dumps([{k:i.get(k) for k in ('id','label','source','sourceLabel','kind','style','figmaType')} for i in xs],ensure_ascii=False,indent=2));return
     for i in xs:print(f'{i["id"]:<60} {i.get("label",i.get("name",""))}  [{i.get("sourceLabel",i.get("source",""))}]')
 def cmd_show(a):print(json.dumps(find_id(load_items(),a.icon),ensure_ascii=False,indent=2))
@@ -203,7 +211,7 @@ def build_parser():
     p=argparse.ArgumentParser(prog='omni-icons',description=f'Omni Icon Vault {version()} — search, Figma, favicons and design-to-code')
     p.add_argument('--version',action='version',version=f'Omni Icon Vault {version()}')
     sp=p.add_subparsers(dest='cmd',required=True)
-    s=sp.add_parser('search');s.add_argument('query');s.add_argument('--source',default='all',help='pack name or kind:ui / kind:brand / kind:developer / kind:favicon');s.add_argument('-n','--limit',type=int,default=20);s.add_argument('--json',action='store_true');s.set_defaults(func=cmd_search)
+    s=sp.add_parser('search');s.add_argument('query');s.add_argument('--source',default='all',help='pack name or kind:ui / kind:brand / kind:developer / kind:favicon');s.add_argument('--format',choices=['all','svg','font','raster'],default='all');s.add_argument('--sort',choices=['relevance','name','pack'],default='relevance');s.add_argument('-n','--limit',type=int,default=20);s.add_argument('--json',action='store_true');s.set_defaults(func=cmd_search)
     s=sp.add_parser('show');s.add_argument('icon');s.set_defaults(func=cmd_show)
     s=sp.add_parser('copy');s.add_argument('icon');s.add_argument('--format',choices=['smart','svg','html','css','glyph','asset','id','json'],default='smart');s.set_defaults(func=cmd_copy)
     s=sp.add_parser('export');s.add_argument('icons',nargs='+');s.add_argument('--out',default='./omni-icons');s.add_argument('--format',choices=['asset','svg','html','css','json','react','vue','svelte'],default='svg');s.set_defaults(func=cmd_export)

@@ -337,7 +337,7 @@ def install_macos_integration(autostart: bool) -> list[str]:
         "<plist version=\"1.0\"><dict>"
         "<key>CFBundleName</key><string>Omni Icon Vault</string>"
         "<key>CFBundleIdentifier</key><string>local.omniiconvault.app</string>"
-        "<key>CFBundleVersion</key><string>4.0.0</string>"
+        f"<key>CFBundleVersion</key><string>{version()}</string>"
         "<key>CFBundleExecutable</key><string>OmniIconVault</string>"
         "</dict></plist>\n",
         "utf-8",

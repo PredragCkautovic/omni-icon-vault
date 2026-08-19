@@ -6,6 +6,8 @@ import shutil
 import sys
 from pathlib import Path
 
+from favicon_manager import sanitize_svg
+
 ROOT = Path(__file__).resolve().parents[1]
 VENDOR = ROOT / 'vendor'
 BROWSER = ROOT / 'browser'
@@ -80,9 +82,12 @@ def add(**kw):
     items.append(kw)
 
 
-def read_svg(path):
+def read_svg(path, sanitize=False):
     try:
-        s=path.read_text('utf-8')
+        raw=path.read_bytes()
+        if sanitize:
+            raw=sanitize_svg(raw)
+        s=raw.decode('utf-8','replace')
     except Exception:
         return ''
     return s if re.search(r'<(?:[A-Za-z_][\w.-]*:)?svg\b', s, re.I) else ''
@@ -378,7 +383,7 @@ def parse_custom():
     root=ROOT/'custom-icons'
     if not root.exists(): return
     for p in sorted(root.rglob('*.svg')):
-        svg=read_svg(p)
+        svg=read_svg(p, sanitize=True)
         if not svg: continue
         rel=p.relative_to(root)
         style=slugify(str(rel.parent)) if str(rel.parent) != '.' else 'custom'

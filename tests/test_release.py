@@ -11,6 +11,7 @@ class ReleaseTests(unittest.TestCase):
             self.assertFalse(any('/vendor/' in x and not x.endswith('/vendor/') for x in names))
             self.assertFalse(any('/cache/' in x and not x.endswith('/cache/') for x in names))
             self.assertTrue(any(x.endswith('/INSTALL_LINUX.sh') for x in names))
+            self.assertEqual(len(names),len(set(names)))
     def test_source_includes_github_workflows(self):
         with tempfile.TemporaryDirectory() as td:
             out=Path(td)/'source.zip';m.build_zip(out,'source',True)

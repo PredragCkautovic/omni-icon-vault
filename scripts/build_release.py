@@ -7,7 +7,7 @@ ROOT=Path(__file__).resolve().parents[1]
 VERSION=(ROOT/'VERSION').read_text('utf-8').strip()
 
 EXCLUDE_DIRS={'.git','.github','dist','build','cache','vendor','__pycache__','.pytest_cache','.idea','.vscode'}
-EXCLUDE_FILES={'.omni-install-state.json'}
+EXCLUDE_FILES={'.omni-install-state.json','README-FIRST.txt'}
 GENERATED={
     'browser/icon-data.json','browser/icon-data.js','browser/source-meta.json','browser/source-meta.js',
     'favicons/registry.json'

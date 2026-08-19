@@ -1,14 +1,194 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Omni Icon Vault</title><link rel="stylesheet" href="../vendor/fontawesome/css/all.min.css"><link rel="stylesheet" href="../vendor/bootstrap/font/bootstrap-icons.min.css"><link rel="stylesheet" href="fonts.css"><link rel="stylesheet" href="style.css"></head><body>
-<div class="shell"><aside class="sidebar"><div class="brand"><div class="brand-mark">OI</div><div><h1>Omni Icon Vault</h1><p>Icons + brands + favicons</p></div></div>
-<nav class="source-list" id="sourceList">
-<button class="source active" data-source="all"><span>All icons</span><b id="count-all">0</b></button>
-<button class="source" data-source="kind:ui"><span>UI icons</span><b id="count-ui">0</b></button>
-<button class="source" data-source="kind:brand"><span>Brands + Favicons</span><b id="count-brand">0</b></button>
-<button class="source" data-source="kind:developer"><span>Developer</span><b id="count-developer">0</b></button>
-<button class="source" data-source="favorites"><span>Favorites</span><b id="count-favorites">0</b></button>
-<div class="nav-heading">PACKS</div><div id="packSources"></div></nav>
-<div class="sidebar-note"><strong>Add any website favicon</strong><code>omni-icons favicon add example.com</code><span><kbd>/</kbd> Search</span><span><kbd>Esc</kbd> Close details</span></div></aside>
-<main class="main"><header class="topbar"><div class="search-wrap"><svg viewBox="0 0 24 24"><path d="m21 21-4.3-4.3m2.3-5.2A7.5 7.5 0 1 1 4 11.5a7.5 7.5 0 0 1 15 0Z"/></svg><input id="search" autocomplete="off" placeholder="Search: camera, github, figma, linux, arrow, favicon…"><kbd>/</kbd></div><select id="copyMode"><option value="smart">Copy: Smart default</option><option value="svg">Copy: SVG</option><option value="glyph">Copy: Glyph</option><option value="html">Copy: HTML</option><option value="css">Copy: CSS</option><option value="id">Copy: Canonical ID</option></select></header>
-<section class="toolbar"><div><h2 id="viewTitle">All icons</h2><p id="resultText">Loading local index…</p></div><div class="toolbar-actions"><button id="clearSearch" class="ghost">Clear</button><button id="randomIcon" class="ghost">Random</button></div></section><section class="icon-grid" id="grid"></section><div class="empty hidden" id="empty"><div>⌕</div><h3>No icons found</h3><p>Try another term or pack.</p></div><button id="loadMore" class="load-more hidden">Show more</button></main></div>
-<div class="toast" id="toast">Copied</div><dialog id="details"><button class="dialog-close" id="closeDialog">×</button><div class="detail-preview" id="detailPreview"></div><div class="detail-meta"><div class="eyebrow" id="detailSource"></div><h2 id="detailName"></h2><p id="detailCode"></p><div class="copy-stack"><button data-copy="id"><b>Icon ID</b><code id="idValue"></code></button><button data-copy="glyph" id="glyphCopyButton"><b>Glyph</b><span id="glyphValue"></span></button><button data-copy="html"><b>HTML</b><code id="htmlValue"></code></button><button data-copy="css"><b>CSS</b><code id="cssValue"></code></button><button data-copy="svg" id="svgCopyButton"><b>SVG</b><span>Copy editable vector</span></button><button data-copy="asset" id="assetCopyButton"><b>Asset</b><span id="assetValue">Copy local asset path</span></button></div><button id="favoriteButton" class="favorite-button">☆ Add to favorites</button></div></dialog>
-<script src="icon-data.js"></script><script src="source-meta.js"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0b10">
+  <title>Omni Icon Vault</title>
+  <link rel="stylesheet" href="../vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="../vendor/bootstrap/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-row">
+      <button class="brand-mark" id="homeButton" aria-label="Show all icons">
+        <span class="brand-diamond">◇</span>
+      </button>
+      <div class="brand-copy">
+        <strong>Omni Icon Vault</strong>
+        <span id="versionLabel">Local icon workspace</span>
+      </div>
+      <button class="icon-button mobile-only" id="closeSidebar" aria-label="Close sidebar">×</button>
+    </div>
+
+    <nav class="primary-nav" id="sourceList" aria-label="Icon library filters">
+      <button class="nav-item active" data-source="all">
+        <span class="nav-icon">⌂</span><span>All icons</span><b id="count-all">—</b>
+      </button>
+      <button class="nav-item" data-source="kind:ui">
+        <span class="nav-icon">◫</span><span>UI icons</span><b id="count-ui">—</b>
+      </button>
+      <button class="nav-item" data-source="kind:brand">
+        <span class="nav-icon">◆</span><span>Brands + favicons</span><b id="count-brand">—</b>
+      </button>
+      <button class="nav-item" data-source="kind:developer">
+        <span class="nav-icon">⌘</span><span>Developer</span><b id="count-developer">—</b>
+      </button>
+      <button class="nav-item" data-source="favorites">
+        <span class="nav-icon">★</span><span>Favorites</span><b id="count-favorites">0</b>
+      </button>
+      <button class="nav-item" data-source="recent">
+        <span class="nav-icon">↺</span><span>Recently used</span><b id="count-recent">0</b>
+      </button>
+
+      <div class="nav-section-title"><span>ICON PACKS</span><button id="collapsePacks" title="Collapse icon packs">−</button></div>
+      <div id="packSources" class="pack-sources"></div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="local-status"><span class="status-dot" id="statusDot"></span><span id="serverStatus">Local server</span></div>
+      <button class="sidebar-action" id="copyFaviconCommand" title="Copy favicon CLI example">
+        <span>＋</span><span><strong>Add a website favicon</strong><small>omni-icons favicon add …</small></span>
+      </button>
+      <div class="shortcut-row"><span><kbd>/</kbd> Search</span><span><kbd>Esc</kbd> Close</span></div>
+    </div>
+  </aside>
+
+  <main class="workspace">
+    <header class="topbar">
+      <button class="icon-button mobile-only" id="openSidebar" aria-label="Open sidebar">☰</button>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15A7.5 7.5 0 1 1 4 11.5a7.5 7.5 0 0 1 15 0Z"/></svg>
+        <input id="search" autocomplete="off" spellcheck="false" placeholder="Search icons, brands, favicons…">
+        <button id="clearSearch" class="search-clear hidden" aria-label="Clear search">×</button>
+        <kbd>/</kbd>
+      </div>
+      <button class="top-action" id="randomIcon" title="Open a random icon">Random</button>
+      <button class="icon-button" id="themeButton" title="Change theme" aria-label="Change theme">◐</button>
+    </header>
+
+    <section class="hero-bar">
+      <div>
+        <div class="eyebrow" id="viewEyebrow">LOCAL LIBRARY</div>
+        <h1 id="viewTitle">All icons</h1>
+        <p id="resultText">Connecting to your local icon index…</p>
+      </div>
+      <div class="hero-actions">
+        <label class="select-wrap"><span>Copy</span><select id="copyMode">
+          <option value="smart">Smart default</option>
+          <option value="svg">SVG</option>
+          <option value="glyph">Glyph</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="id">Canonical ID</option>
+          <option value="manifest">Manifest entry</option>
+        </select></label>
+        <label class="select-wrap"><span>Sort</span><select id="sortMode">
+          <option value="relevance">Relevance</option>
+          <option value="name">Name</option>
+          <option value="pack">Pack</option>
+        </select></label>
+        <div class="density-switch" role="group" aria-label="Grid density">
+          <button data-density="compact" title="Compact grid">▦</button>
+          <button data-density="comfortable" class="active" title="Comfortable grid">▦</button>
+          <button data-density="large" title="Large grid">▣</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="stat-strip" id="statStrip">
+      <button data-source="kind:ui"><strong id="statUi">—</strong><span>UI</span></button>
+      <button data-source="kind:brand"><strong id="statBrand">—</strong><span>Brands + favicons</span></button>
+      <button data-source="kind:developer"><strong id="statDeveloper">—</strong><span>Developer</span></button>
+      <div class="stat-divider"></div>
+      <div><strong id="statSources">—</strong><span>Sources</span></div>
+      <div><strong id="statTotal">—</strong><span>Total indexed</span></div>
+    </section>
+
+    <section class="filter-row" aria-label="Quick filters">
+      <div class="filter-chips" id="formatFilters">
+        <button class="chip active" data-format="all">All formats</button>
+        <button class="chip" data-format="svg">Vector SVG</button>
+        <button class="chip" data-format="font">Font glyph</button>
+        <button class="chip" data-format="raster">Raster</button>
+      </div>
+      <div class="query-help">Tip: search <code>github</code>, <code>camera</code>, <code>python</code>, <code>arrow</code>…</div>
+    </section>
+
+    <section class="icon-grid" id="grid" aria-live="polite"></section>
+
+    <section class="empty-state hidden" id="empty">
+      <div class="empty-mark">⌕</div>
+      <h2>No matching icons</h2>
+      <p>Try a broader search, another pack, or remove the format filter.</p>
+      <button class="primary-button" id="resetFilters">Reset filters</button>
+    </section>
+
+    <div class="loading-row hidden" id="loadingRow"><span></span><span></span><span></span></div>
+    <button id="loadMore" class="load-more hidden">Load more</button>
+    <div class="page-footer"><span>Omni Icon Vault runs locally on your machine.</span><span id="footerMeta"></span></div>
+  </main>
+</div>
+
+<div class="scrim hidden" id="sidebarScrim"></div>
+<div class="toast" id="toast" role="status">Copied</div>
+
+<aside class="detail-drawer" id="details" aria-hidden="true">
+  <div class="drawer-header">
+    <div><div class="eyebrow" id="detailSource"></div><h2 id="detailName">Icon</h2></div>
+    <button class="icon-button" id="closeDetails" aria-label="Close details">×</button>
+  </div>
+
+  <div class="preview-stage" id="previewStage">
+    <div class="preview-icon" id="detailPreview"></div>
+  </div>
+
+  <div class="preview-controls">
+    <label>Size <input id="previewSize" type="range" min="24" max="180" value="96"><output id="previewSizeValue">96</output></label>
+    <label>Color <input id="previewColor" type="color" value="#f5f3ff"></label>
+    <div class="preview-backgrounds" id="previewBackgrounds">
+      <button class="active" data-bg="dark" title="Dark background"></button>
+      <button data-bg="light" title="Light background"></button>
+      <button data-bg="transparent" title="Transparent grid"></button>
+    </div>
+  </div>
+
+  <div class="detail-info-grid">
+    <div><span>Source</span><strong id="detailPack">—</strong></div>
+    <div><span>Style</span><strong id="detailStyle">—</strong></div>
+    <div><span>Type</span><strong id="detailType">—</strong></div>
+    <div><span>Unicode</span><strong id="detailCode">—</strong></div>
+  </div>
+
+  <div class="id-block"><span>Canonical ID</span><code id="idValue"></code><button data-copy="id">Copy</button></div>
+
+  <div class="action-grid">
+    <button data-copy="smart" class="primary-action"><span>⌘</span><b>Copy best format</b><small id="smartFormatLabel">SVG</small></button>
+    <button data-copy="svg" id="svgCopyButton"><span>◇</span><b>Copy SVG</b><small>Editable vector</small></button>
+    <button data-copy="html" id="htmlCopyButton"><span>&lt;/&gt;</span><b>Copy HTML</b><small>Web markup</small></button>
+    <button data-copy="css" id="cssCopyButton"><span>#</span><b>Copy CSS</b><small>CSS snippet</small></button>
+    <button data-copy="glyph" id="glyphCopyButton"><span>A</span><b>Copy glyph</b><small>Font character</small></button>
+    <button data-copy="manifest"><span>{ }</span><b>Manifest entry</b><small>Project sync</small></button>
+  </div>
+
+  <div class="drawer-footer-actions">
+    <button id="favoriteButton">☆ Add to favorites</button>
+    <button id="downloadButton">↓ Download asset</button>
+  </div>
+
+  <details class="advanced-details">
+    <summary>Developer details</summary>
+    <div class="code-row"><span>HTML</span><code id="htmlValue"></code></div>
+    <div class="code-row"><span>CSS</span><code id="cssValue"></code></div>
+    <div class="code-row"><span>Glyph</span><code id="glyphValue"></code></div>
+    <div class="code-row"><span>URL</span><code id="urlValue"></code></div>
+  </details>
+</aside>
+
+<script src="app.js"></script>
+</body>
+</html>
