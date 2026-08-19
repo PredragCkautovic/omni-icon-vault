@@ -33,3 +33,12 @@ Thumbs.db
 /dist/
 /build/
 *.log
+
+# Local patch / handoff artifacts (never commit)
+/APPLY_*.sh
+/APPLY-*.txt
+/*NO-PUSH*.txt
+/*FIX*.txt
+/Omni-Icon-Vault-*-Patch/
+/Omni-Icon-Vault-*.zip
+/Omni-Icon-Vault-*.zip.sha256

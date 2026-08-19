@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="720" viewBox="0 0 1400 720" role="img" aria-labelledby="title desc">
+<title id="title">Omni Icon Vault</title><desc id="desc">A dark purple product hero showing the local icon browser with search, source navigation, capability filters and icon preview.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#090910"/><stop offset=".58" stop-color="#11101c"/><stop offset="1" stop-color="#1b1030"/></linearGradient>
+  <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b794f6"/><stop offset=".52" stop-color="#7c3aed"/><stop offset="1" stop-color="#4c1d95"/></linearGradient>
+  <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#ffffff" stop-opacity=".08"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="20" stdDeviation="26" flood-color="#000" flood-opacity=".5"/></filter>
+</defs>
+<rect width="1400" height="720" rx="32" fill="url(#bg)"/>
+<circle cx="1280" cy="40" r="280" fill="#6d28d9" opacity=".10"/><circle cx="120" cy="710" r="300" fill="#7c3aed" opacity=".08"/>
+<g font-family="Inter,Segoe UI,Arial,sans-serif">
+  <g transform="translate(72 62)">
+    <rect width="64" height="64" rx="19" fill="url(#purple)"/><rect x="20" y="20" width="24" height="24" rx="2" fill="none" stroke="white" stroke-width="5"/>
+    <text x="88" y="29" fill="#faf8ff" font-size="34" font-weight="800">Omni Icon Vault</text>
+    <text x="88" y="56" fill="#a9a6b8" font-size="15">one local workspace · every icon workflow</text>
+  </g>
+  <text x="72" y="190" fill="#f5f3ff" font-size="46" font-weight="800">Find once. Use everywhere.</text>
+  <text x="72" y="232" fill="#b0adbf" font-size="18">Search UI icons, brands, developer glyphs, favicons and custom SVGs.</text>
+  <text x="72" y="260" fill="#b0adbf" font-size="18">Copy the format you need. Keep the same canonical ID from Figma to code.</text>
+  <g transform="translate(72 300)" font-size="14" font-weight="600">
+    <g><rect width="134" height="40" rx="20" fill="#1d1730" stroke="#5b3ea3"/><text x="67" y="25" text-anchor="middle" fill="#d8ccff">Local-first</text></g>
+    <g transform="translate(148)"><rect width="160" height="40" rx="20" fill="#14141f" stroke="#343245"/><text x="80" y="25" text-anchor="middle" fill="#d6d3e1">Figma + Web UI</text></g>
+    <g transform="translate(322)"><rect width="176" height="40" rx="20" fill="#14141f" stroke="#343245"/><text x="88" y="25" text-anchor="middle" fill="#d6d3e1">SVG · Glyph · CSS</text></g>
+    <g transform="translate(512)"><rect width="144" height="40" rx="20" fill="#14141f" stroke="#343245"/><text x="72" y="25" text-anchor="middle" fill="#d6d3e1">Cross-platform</text></g>
+  </g>
+  <g transform="translate(72 388)">
+    <text x="0" y="0" fill="#8f8ca2" font-size="13" font-weight="700" letter-spacing="2">WORKFLOWS</text>
+    <g transform="translate(0 28)">
+      <rect width="660" height="126" rx="20" fill="#0f0f18" stroke="#2b293a"/>
+      <g transform="translate(24 22)" font-size="13">
+        <text fill="#a78bfa" font-weight="700">WEB UI</text><text x="0" y="28" fill="#ece9f6">Browse, filter, favorite, preview and copy</text><text x="0" y="52" fill="#8f8ca2">Exact capability filtering for SVG, Glyph, HTML and CSS.</text>
+        <text x="350" fill="#a78bfa" font-weight="700">DEVELOPMENT</text><text x="350" y="28" fill="#ece9f6">CLI · API · React · Vue · Svelte</text><text x="350" y="52" fill="#8f8ca2">Canonical IDs keep design and code synchronized.</text>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(760 74)" filter="url(#shadow)">
+    <rect width="568" height="574" rx="26" fill="#101019" stroke="#343047"/>
+    <rect width="568" height="56" rx="26" fill="#151520"/><rect y="30" width="568" height="26" fill="#151520"/>
+    <circle cx="28" cy="28" r="6" fill="#f87171"/><circle cx="48" cy="28" r="6" fill="#fbbf24"/><circle cx="68" cy="28" r="6" fill="#34d399"/>
+    <rect x="110" y="14" width="316" height="28" rx="10" fill="#0c0c13" stroke="#292738"/><text x="130" y="33" fill="#706d82" font-size="12">Search icons…</text>
+    <g transform="translate(0 56)">
+      <rect width="154" height="518" fill="#0d0d15"/><text x="18" y="31" fill="#79768b" font-size="10" font-weight="700" letter-spacing="1.5">LIBRARY</text>
+      <g font-size="12" fill="#b7b4c5">
+        <rect x="10" y="45" width="134" height="34" rx="9" fill="#211938" stroke="#5a3aa0"/><text x="38" y="66" fill="#eee9ff">All icons</text><circle cx="24" cy="62" r="5" fill="#8b5cf6"/>
+        <text x="38" y="106">UI icons</text><circle cx="24" cy="102" r="5" fill="#59576a"/>
+        <text x="38" y="142">Brands + favicons</text><circle cx="24" cy="138" r="5" fill="#59576a"/>
+        <text x="38" y="178">Developer</text><circle cx="24" cy="174" r="5" fill="#59576a"/>
+        <text x="38" y="214">Favorites</text><circle cx="24" cy="210" r="5" fill="#59576a"/>
+      </g>
+      <text x="18" y="258" fill="#79768b" font-size="10" font-weight="700" letter-spacing="1.5">ICON PACKS</text>
+      <g font-size="11" fill="#8f8ca2"><text x="38" y="292">Tabler Icons</text><text x="38" y="326">Lucide</text><text x="38" y="360">Material Symbols</text><text x="38" y="394">Nerd Fonts</text><text x="38" y="428">Simple Icons</text></g>
+      <g transform="translate(154 0)">
+        <rect width="414" height="64" fill="#12121b"/><text x="18" y="23" fill="#7f7c91" font-size="10" font-weight="700">COPY / FILTER</text><rect x="18" y="31" width="142" height="26" rx="8" fill="#1d1730" stroke="#5b3ea3"/><text x="34" y="49" fill="#d9d1f6" font-size="11">SVG only</text>
+        <text x="181" y="23" fill="#7f7c91" font-size="10" font-weight="700">SIZE</text><rect x="181" y="31" width="70" height="26" rx="8" fill="#0d0d14" stroke="#302d40"/><text x="204" y="49" fill="#d9d6e4" font-size="11">48 px</text>
+        <g transform="translate(18 82)">
+          <text x="0" y="0" fill="#9b98aa" font-size="11">SVG-capable icons</text>
+          <g transform="translate(0 18)">
+            <g><rect width="112" height="126" rx="14" fill="#14141d" stroke="#302d42"/><path d="M33 48h46M56 25v46" stroke="#d7d3e2" stroke-width="4" stroke-linecap="round"/><text x="56" y="90" text-anchor="middle" fill="#dedbe8" font-size="11">plus</text><text x="56" y="110" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="700">COPY SVG</text></g>
+            <g transform="translate(126)"><rect width="112" height="126" rx="14" fill="#14141d" stroke="#302d42"/><path d="M30 60 56 34l26 26" fill="none" stroke="#d7d3e2" stroke-width="4" stroke-linecap="round"/><text x="56" y="90" text-anchor="middle" fill="#dedbe8" font-size="11">chevron-up</text><text x="56" y="110" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="700">COPY SVG</text></g>
+            <g transform="translate(252)"><rect width="112" height="126" rx="14" fill="#14141d" stroke="#302d42"/><circle cx="56" cy="50" r="23" fill="none" stroke="#d7d3e2" stroke-width="4"/><path d="M56 38v24M44 50h24" stroke="#d7d3e2" stroke-width="4"/><text x="56" y="90" text-anchor="middle" fill="#dedbe8" font-size="11">circle-plus</text><text x="56" y="110" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="700">COPY SVG</text></g>
+          </g>
+          <g transform="translate(0 160)">
+            <g><rect width="112" height="126" rx="14" fill="#14141d" stroke="#302d42"/><path d="M33 40h46v38H33z" fill="none" stroke="#d7d3e2" stroke-width="4"/><text x="56" y="90" text-anchor="middle" fill="#dedbe8" font-size="11">window</text><text x="56" y="110" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="700">COPY SVG</text></g>
+            <g transform="translate(126)"><rect width="112" height="126" rx="14" fill="#14141d" stroke="#302d42"/><path d="M35 68 56 35l21 33z" fill="none" stroke="#d7d3e2" stroke-width="4"/><text x="56" y="90" text-anchor="middle" fill="#dedbe8" font-size="11">triangle</text><text x="56" y="110" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="700">COPY SVG</text></g>
+            <g transform="translate(252)"><rect width="112" height="126" rx="14" fill="#171326" stroke="#6d4ac0"/><path d="M36 42h40M36 54h40M36 66h28" stroke="#f0ebff" stroke-width="4" stroke-linecap="round"/><text x="56" y="90" text-anchor="middle" fill="#f2edff" font-size="11">menu</text><text x="56" y="110" text-anchor="middle" fill="#c4b5fd" font-size="9" font-weight="700">COPY SVG</text></g>
+          </g>
+          <rect y="312" width="364" height="78" rx="14" fill="#11111a" stroke="#2b293a"/><text x="16" y="337" fill="#8e8b9e" font-size="10">CANONICAL ID</text><text x="16" y="361" fill="#c4b5fd" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="12">tabler:outline:menu</text><rect x="266" y="326" width="80" height="34" rx="9" fill="url(#purple)"/><text x="306" y="347" text-anchor="middle" fill="white" font-size="11" font-weight="700">Copy SVG</text>
+        </g>
+      </g>
+    </g>
+    <rect width="568" height="574" rx="26" fill="url(#shine)" pointer-events="none"/>
+  </g>
+</g>
+</svg>
