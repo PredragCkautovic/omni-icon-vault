@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_for": "Omni Icon Vault 4.1.0",
+  "generated_for": "Omni Icon Vault 4.1.1",
   "archives": [
     {
       "id": "fontawesome-web",
@@ -106,12 +106,11 @@
       "source": "phosphor",
       "version": "2.1.1",
       "required": false,
-      "cache": "phosphor-2.1.1.zip",
+      "cache": "phosphor-core-2.1.1.tgz",
       "target": "phosphor",
-      "type": "zip",
+      "type": "tar.gz",
       "urls": [
-        "https://github.com/phosphor-icons/core/archive/refs/tags/v2.1.1.zip",
-        "https://github.com/phosphor-icons/core/archive/refs/tags/2.1.1.zip"
+        "https://registry.npmjs.org/@phosphor-icons/core/-/core-2.1.1.tgz"
       ]
     },
     {

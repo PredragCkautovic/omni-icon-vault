@@ -167,26 +167,63 @@ def parse_fa():
 
 
 def parse_bootstrap():
-    base=VENDOR/'bootstrap'; mapping={}
-    jsonf=next(base.rglob('bootstrap-icons.json'),None) if base.exists() else None
+    base=VENDOR/'bootstrap'
+    if not base.exists():
+        print('WARN: Bootstrap assets not found',file=sys.stderr); return
+
+    # Bootstrap release archives have changed layout across versions. 1.13.1,
+    # for example, places some font metadata at archive root. Locate the real
+    # SVG directory instead of assuming vendor/bootstrap/icons.
+    icon_root=best_dir(base,'icons')
+    if not icon_root:
+        # Last-resort: use the directory with the largest direct SVG set.
+        dirs={}
+        for svg_file in base.rglob('*.svg'):
+            dirs[svg_file.parent]=dirs.get(svg_file.parent,0)+1
+        icon_root=max(dirs,key=dirs.get) if dirs else None
+    if not icon_root:
+        print('WARN: Bootstrap icons directory not found',file=sys.stderr); return
+
+    mapping={}
+    jsonf=None
+    for candidate in ('bootstrap-icons.json','bootstrapicons.json'):
+        jsonf=next(base.rglob(candidate),None)
+        if jsonf: break
     if jsonf:
-        try: mapping=json.loads(jsonf.read_text('utf-8'))
+        try:
+            raw=json.loads(jsonf.read_text('utf-8'))
+            if isinstance(raw,dict): mapping=raw
         except Exception: pass
     if not mapping:
-        cssf=next(base.rglob('bootstrap-icons.css'),None) if base.exists() else None
+        cssf=next(base.rglob('bootstrap-icons.css'),None)
         if cssf:
             txt=cssf.read_text('utf-8',errors='ignore')
-            for name,code in re.findall(r'\.bi-([a-z0-9-]+)::before\s*\{[^}]*content:\s*["\']\\([0-9a-fA-F]+)["\']',txt,re.I|re.S): mapping[name]=code
+            for name,code in re.findall(r'\.bi-([a-z0-9-]+)::before\s*\{[^}]*content:\s*["\']\\([0-9a-fA-F]+)["\']',txt,re.I|re.S):
+                mapping[name]=code
+
+    indexed=set()
     for name,val in mapping.items():
         if isinstance(val,int): code=f'{val:x}'
         else:
             raw=str(val).strip(); code=f'{int(raw):x}' if raw.isdigit() else raw.replace('\\','').replace('U+','').replace('u','').lower()
         if not re.fullmatch(r'[0-9a-f]+',code): continue
-        svg_path=base/'icons'/f'{name}.svg'; svg=read_svg(svg_path) if svg_path.exists() else ''
+        svg_path=icon_root/f'{name}.svg'
+        svg=read_svg(svg_path) if svg_path.exists() else ''
         if not svg: continue
+        indexed.add(name)
         char=chr(int(code,16))
         add(source='bootstrap',name=name,label=labelize(name),style='',code=code,char=char,terms=[],svg=svg,render='fill',
             html=f'<i class="bi bi-{name}"></i>',css=f'.icon-{name}::before {{ font-family: "bootstrap-icons"; content: "\\{code}"; }}')
+
+    # SVG is Bootstrap Icons' primary distribution format. If the release's
+    # font metadata is absent or moved, still index every real SVG rather than
+    # failing the whole installation.
+    for svg_path in sorted(icon_root.glob('*.svg')):
+        name=svg_path.stem
+        if name in indexed: continue
+        svg=read_svg(svg_path)
+        if not svg: continue
+        vector_item('bootstrap',name,svg,'',terms=['bootstrap'],render='fill')
 
 
 def parse_nerd():

@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.1.1 — Installer reliability hotfix
+
+- Fix Bootstrap Icons 1.13.1 release-layout detection and add an SVG-only indexing fallback.
+- Add automatic self-healing for stale/corrupt required source caches.
+- Fetch Phosphor Core 2.1.1 from its published npm package instead of a non-existent GitHub tag.
+- Add `.tar.gz`/`.tgz` extraction support.
+- Ensure CLI integration is reached after recoverable source-cache failures.
+
+
 ## 4.1.0 — Workspace UI upgrade
 
 - Rebuilt the local browser as an API-driven, paginated icon workspace.

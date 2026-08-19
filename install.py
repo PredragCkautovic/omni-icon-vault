@@ -109,15 +109,19 @@ def extract_archive(archive: Path, target: Path, kind: str) -> None:
                 if bad:
                     raise RuntimeError(f"Unsafe ZIP member: {bad[0]}")
                 zf.extractall(tmp)
-        elif kind == "tar.xz":
-            with tarfile.open(archive, "r:xz") as tf:
+        elif kind in ("tar.xz", "tar.gz", "tgz"):
+            mode = "r:xz" if kind == "tar.xz" else "r:gz"
+            with tarfile.open(archive, mode) as tf:
                 members = tf.getmembers()
                 bad = [m.name for m in members if not _safe_member(tmp, m.name)]
                 if bad:
                     raise RuntimeError(f"Unsafe tar member: {bad[0]}")
                 # Avoid special files / links from upstream archives.
                 members = [m for m in members if m.isfile() or m.isdir()]
-                tf.extractall(tmp, members=members)
+                if sys.version_info >= (3, 12):
+                    tf.extractall(tmp, members=members, filter="data")
+                else:
+                    tf.extractall(tmp, members=members)
         else:
             raise RuntimeError(f"Unsupported archive type: {kind}")
 
@@ -157,7 +161,7 @@ def harvest_license(source_id: str, target: Path) -> None:
             break
 
 
-def prepare_vendor(refresh: bool = False, core_only: bool = False) -> None:
+def prepare_vendor(refresh: bool = False, core_only: bool = False, only_sources: set[str] | None = None) -> None:
     cfg = load_sources()
     CACHE.mkdir(parents=True, exist_ok=True)
     VENDOR.mkdir(parents=True, exist_ok=True)
@@ -171,6 +175,8 @@ def prepare_vendor(refresh: bool = False, core_only: bool = False) -> None:
                     p.unlink()
 
     for spec in cfg.get("archives", []):
+        if only_sources and spec.get("source") not in only_sources:
+            continue
         if core_only and not spec.get("required"):
             continue
         archive = CACHE / spec["cache"]
@@ -183,6 +189,8 @@ def prepare_vendor(refresh: bool = False, core_only: bool = False) -> None:
         harvest_license(spec["source"], target)
 
     for spec in cfg.get("files", []):
+        if only_sources and spec.get("source") not in only_sources:
+            continue
         cache = CACHE / spec["cache"]
         ok = download(cache, spec["urls"], bool(spec.get("required")), spec.get("sha256"))
         if not ok:
@@ -192,16 +200,51 @@ def prepare_vendor(refresh: bool = False, core_only: bool = False) -> None:
         shutil.copy2(cache, target)
 
 
-def build_index() -> Counter:
+def required_icon_sources() -> list[str]:
+    cfg = load_sources()
+    # These are source families that are required to produce searchable icons.
+    # Multiple required download specs may belong to the same source.
+    return sorted({
+        spec.get("source")
+        for group in ("archives", "files")
+        for spec in cfg.get(group, [])
+        if spec.get("required") and spec.get("source")
+    })
+
+
+def missing_required_sources(counts: Counter) -> list[str]:
+    return [src for src in required_icon_sources() if counts[src] == 0]
+
+
+def reset_source_assets(sources: set[str]) -> None:
+    """Discard cached/vendor data only for selected sources before a clean retry."""
+    cfg = load_sources()
+    for group in ("archives", "files"):
+        for spec in cfg.get(group, []):
+            if spec.get("source") not in sources:
+                continue
+            cache = CACHE / spec["cache"]
+            if cache.exists():
+                if cache.is_dir():
+                    shutil.rmtree(cache, ignore_errors=True)
+                else:
+                    cache.unlink(missing_ok=True)
+            target = VENDOR / spec["target"]
+            if group == "archives":
+                shutil.rmtree(target, ignore_errors=True)
+            elif target.exists():
+                target.unlink(missing_ok=True)
+
+
+def build_index(strict: bool = True) -> Counter:
     log("Building searchable icon index...")
     subprocess.run([sys.executable, str(TOOLS / "build-index.py")], cwd=ROOT, check=True)
     data = json.loads((ROOT / "browser" / "icon-data.json").read_text("utf-8"))
     if not isinstance(data, list):
         raise RuntimeError("Generated icon-data.json is invalid")
     counts = Counter(x.get("source", "unknown") for x in data)
-    core = ["fontawesome", "bootstrap", "nerdfonts", "material", "tabler"]
-    missing = [x for x in core if counts[x] == 0]
-    if missing:
+    missing = missing_required_sources(counts)
+    if missing and strict:
         raise RuntimeError("Installation incomplete; zero icons indexed for: " + ", ".join(missing))
     log("\nIndexed icon counts:")
     order = ["fontawesome", "bootstrap", "nerdfonts", "material", "tabler", "simpleicons", "lucide", "heroicons", "phosphor", "iconoir", "ionicons", "octicons", "devicon", "fluent", "favicons", "custom"]
@@ -436,7 +479,15 @@ def main() -> int:
     (ROOT / "browser" / "assets" / "favicons").mkdir(parents=True, exist_ok=True)
 
     prepare_vendor(refresh=a.refresh, core_only=a.core_only)
-    build_index()
+    counts = build_index(strict=False)
+    missing = missing_required_sources(counts)
+    if missing:
+        log("\nRequired source validation failed: " + ", ".join(missing))
+        log("Self-healing: discarding only the affected cache/vendor data and downloading it again...")
+        affected = set(missing)
+        reset_source_assets(affected)
+        prepare_vendor(refresh=False, core_only=False, only_sources=affected)
+        build_index(strict=True)
     fonts = [] if a.no_fonts else install_fonts()
     created: list[str] = []
     path_modified = False

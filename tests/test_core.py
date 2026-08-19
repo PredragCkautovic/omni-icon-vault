@@ -22,7 +22,7 @@ class CoreTests(unittest.TestCase):
         v=(ROOT/'VERSION').read_text().strip()
         manifest=json.loads((ROOT/'manifest.json').read_text())
         self.assertEqual(v,manifest['version'])
-        self.assertEqual(v,'4.1.0')
+        self.assertEqual(v,'4.1.1')
 
     def test_sources_are_pinned_and_unique(self):
         cfg=json.loads((ROOT/'sources.json').read_text())
@@ -118,5 +118,31 @@ class CoreTests(unittest.TestCase):
     def test_custom_svg_index_uses_sanitizer(self):
         text=(ROOT/'tools'/'build-index.py').read_text('utf-8')
         self.assertIn('read_svg(p, sanitize=True)',text)
+
+    def test_tar_gz_archive_supported(self):
+        import tarfile
+        with tempfile.TemporaryDirectory() as td:
+            td=Path(td); src=td/'src'; src.mkdir(); (src/'ok.txt').write_text('ok')
+            arc=td/'sample.tgz'
+            with tarfile.open(arc,'w:gz') as tf: tf.add(src/'ok.txt',arcname='package/ok.txt')
+            out=td/'out'; install.extract_archive(arc,out,'tar.gz')
+            self.assertEqual((out/'ok.txt').read_text(),'ok')
+
+    def test_phosphor_uses_pinned_npm_tarball(self):
+        cfg=json.loads((ROOT/'sources.json').read_text())
+        phosphor=next(x for x in cfg['archives'] if x['id']=='phosphor')
+        self.assertEqual(phosphor['version'],'2.1.1')
+        self.assertEqual(phosphor['type'],'tar.gz')
+        self.assertIn('registry.npmjs.org/@phosphor-icons/core/-/core-2.1.1.tgz',phosphor['urls'][0])
+
+    def test_bootstrap_parser_has_svg_fallback(self):
+        text=(ROOT/'tools'/'build-index.py').read_text('utf-8')
+        self.assertIn("for candidate in ('bootstrap-icons.json','bootstrapicons.json')",text)
+        self.assertIn("for svg_path in sorted(icon_root.glob('*.svg'))",text)
+
+    def test_installer_self_heals_required_source_cache(self):
+        text=(ROOT/'install.py').read_text('utf-8')
+        self.assertIn('reset_source_assets(affected)',text)
+        self.assertIn('only_sources=affected',text)
 
 if __name__=='__main__':unittest.main()

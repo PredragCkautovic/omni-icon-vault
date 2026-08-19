@@ -1,6 +1,6 @@
 {
   "name": "Omni Icon Vault",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "channel": "stable",
   "description": "Cross-platform local icon workspace with fast API-driven search, Figma integration, favicons and design-to-code export.",
   "platforms": [
