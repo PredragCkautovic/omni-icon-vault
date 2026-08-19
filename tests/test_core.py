@@ -33,7 +33,7 @@ class CoreTests(unittest.TestCase):
         v=(ROOT/'VERSION').read_text().strip()
         manifest=json.loads((ROOT/'manifest.json').read_text())
         self.assertEqual(v,manifest['version'])
-        self.assertEqual(v,'4.1.2')
+        self.assertEqual(v,'4.1.3')
 
     def test_sources_are_pinned_and_unique(self):
         cfg=json.loads((ROOT/'sources.json').read_text())

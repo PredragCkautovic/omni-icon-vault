@@ -1,16 +1,25 @@
-# Omni Icon Vault 4.1.2
+# Omni Icon Vault 4.1.3
 
-### Final UI polish
-- Sticky filters and visible active copy-capability indicator.
-- Capability badges and explicit copy hints on icon cards.
-- Responsive Copy/Sort controls remain available on phones.
-- Skeleton loading, refined empty states, and improved card/detail interactions.
-- Detail drawer now shows available copy capabilities and its primary action follows the active copy mode.
+A small reliability and usability release that rolls the latest v4.1.2 UI fixes into a clean public build and hardens GitHub release publishing.
 
-This patch makes the Web UI Copy selector behave as a true filter. Selecting SVG, Glyph, HTML, or CSS immediately narrows the grid to icons that actually support that copy format, including Favorites and Recent views. The local search API now accepts `capability=` and returns capability metadata for consistent pagination and filtering.
+## Highlights
 
+- Exact preview-size field now supports normal typing without clamping mid-entry.
+- Preview slider and exact pixel field stay synchronized and persist the chosen size.
+- Keeps the v4.1.2 capability filtering, stale-server recovery, sidebar icon polish, responsive controls, favorites/recent views, and improved detail drawer.
+- Release workflow now normalizes `VERSION`, prints tag diagnostics, verifies generated archives, and treats reruns of an already-published release safely.
 
+## Upgrade
 
-### Sidebar polish
+Install from the platform release archive or update an existing source checkout:
 
-The sidebar now uses one consistent monochrome outline icon system across categories and every icon pack, replacing mixed glyphs/monograms/dots with aligned, accessible SVG marks.
+```bash
+git pull
+python install.py
+```
+
+Then open Omni:
+
+```bash
+omni-icons open
+```

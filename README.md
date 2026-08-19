@@ -617,17 +617,18 @@ Read these before contributing:
 Releases are tag-driven and the repository includes CI for Windows, macOS, and Linux.
 
 ```bash
-git tag -a v4.1.0 -m "Omni Icon Vault 4.1.0"
-git push origin v4.1.0
+VERSION="$(cat VERSION)"
+git tag -a "v$VERSION" -m "Omni Icon Vault $VERSION"
+git push origin "v$VERSION"
 ```
 
 The release pipeline builds:
 
 ```text
-Omni-Icon-Vault-4.1.0-source.zip
-Omni-Icon-Vault-4.1.0-windows.zip
-Omni-Icon-Vault-4.1.0-macos.zip
-Omni-Icon-Vault-4.1.0-linux.zip
+Omni-Icon-Vault-<version>-source.zip
+Omni-Icon-Vault-<version>-windows.zip
+Omni-Icon-Vault-<version>-macos.zip
+Omni-Icon-Vault-<version>-linux.zip
 SHA256SUMS.txt
 ```
 

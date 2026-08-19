@@ -3,13 +3,18 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   test:
+    name: Test (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
@@ -24,27 +29,73 @@ jobs:
       - run: python -m compileall -q install.py uninstall.py omni.py tools scripts tests
 
   release:
+    name: Build and publish
     needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Validate tag matches VERSION
+
+      - name: Validate release tag
         shell: bash
         run: |
-          test "v$(cat VERSION)" = "$GITHUB_REF_NAME"
+          set -euo pipefail
+          VERSION_VALUE="$(tr -d '\r\n\t ' < VERSION)"
+          EXPECTED_TAG="v${VERSION_VALUE}"
+
+          echo "VERSION=${VERSION_VALUE}"
+          echo "EXPECTED_TAG=${EXPECTED_TAG}"
+          echo "GITHUB_REF=${GITHUB_REF}"
+          echo "GITHUB_REF_TYPE=${GITHUB_REF_TYPE}"
+          echo "GITHUB_REF_NAME=${GITHUB_REF_NAME}"
+          echo "GITHUB_SHA=${GITHUB_SHA}"
+
+          if [[ "${GITHUB_REF_TYPE}" != "tag" ]]; then
+            echo "::error::Release workflow must run from a tag, got ${GITHUB_REF_TYPE}."
+            exit 1
+          fi
+
+          if [[ "${EXPECTED_TAG}" != "${GITHUB_REF_NAME}" ]]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match VERSION ${VERSION_VALUE} (expected ${EXPECTED_TAG})."
+            exit 1
+          fi
+
       - name: Build release archives
         run: python scripts/build_release.py --dist dist
+
+      - name: Verify release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "dist/Omni-Icon-Vault-$(cat VERSION)-source.zip"
+          test -f "dist/Omni-Icon-Vault-$(cat VERSION)-windows.zip"
+          test -f "dist/Omni-Icon-Vault-$(cat VERSION)-macos.zip"
+          test -f "dist/Omni-Icon-Vault-$(cat VERSION)-linux.zip"
+          test -f dist/SHA256SUMS.txt
+          cat dist/SHA256SUMS.txt
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh release create "$GITHUB_REF_NAME" \
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          VERSION_VALUE="$(tr -d '\r\n\t ' < VERSION)"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists. This is a safe rerun; skipping creation."
+            exit 0
+          fi
+
+          gh release create "$TAG" \
             dist/Omni-Icon-Vault-*.zip \
             dist/SHA256SUMS.txt \
             --verify-tag \
             --notes-file RELEASE_NOTES.md \
-            --title "Omni Icon Vault $(cat VERSION)"
+            --title "Omni Icon Vault ${VERSION_VALUE}" \
+            --latest

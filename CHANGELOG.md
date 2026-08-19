@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.1.3
+
+- Fixed exact preview-size typing so the field is not clamped or rewritten mid-entry.
+- Kept slider and exact-size input synchronized with persisted preview size.
+- Hardened GitHub release validation and diagnostics.
+- Made release workflow reruns safe when the release already exists.
+- Rolled the final v4.1.2 sidebar, capability-filter, responsive UI, and stale-server fixes into the next public release.
+
 ## 4.1.2
 
 - Polished the Web UI sidebar icon system: every main category and every pack now uses a uniform monochrome outline icon, consistent sizing, alignment, hover, and active states.
