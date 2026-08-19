@@ -1,0 +1,35 @@
+# Downloaded/generated third-party assets
+/cache/*
+!/cache/.gitkeep
+/vendor/*
+!/vendor/.gitkeep
+/licenses/upstream/*
+!/licenses/upstream/.gitkeep
+
+# Generated browser index/assets
+/browser/icon-data.json
+/browser/icon-data.js
+/browser/source-meta.json
+/browser/source-meta.js
+/browser/assets/nerd-symbols.ttf
+/browser/assets/material-symbols-outlined.ttf
+/browser/assets/favicons/*
+!/browser/assets/favicons/.gitkeep
+
+# Local user data
+/favicons/registry.json
+/.omni-install-state.json
+
+# Python/editor/OS
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Release output
+/dist/
+/build/
+*.log

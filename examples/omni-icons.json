@@ -1,0 +1,9 @@
+{
+  "format": "svg",
+  "out": "src/icons",
+  "icons": [
+    {"id": "tabler:outline:camera", "as": "Camera"},
+    {"id": "fontawesome:solid:user", "as": "User"},
+    {"id": "bootstrap:house", "as": "Home"}
+  ]
+}

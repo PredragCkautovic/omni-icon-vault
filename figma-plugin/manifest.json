@@ -1,0 +1,15 @@
+{
+  "name": "Omni Icon Vault Local",
+  "id": "1498765432109876543",
+  "api": "1.0.0",
+  "editorType": ["figma"],
+  "main": "code.js",
+  "ui": "ui.html",
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "http://localhost:17836"
+    ],
+    "reasoning": "This private local plugin connects only to the Omni Icon Vault server running on localhost on this computer."
+  }
+}

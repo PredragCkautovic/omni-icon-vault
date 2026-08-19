@@ -1,0 +1,21 @@
+{
+  "name": "Omni Icon Vault",
+  "version": "4.0.0",
+  "channel": "stable",
+  "description": "Cross-platform local searchable icon, brand, favicon, Figma and design-to-code pipeline.",
+  "platforms": ["Windows 10/11", "macOS", "Linux"],
+  "python": ">=3.10",
+  "local_api": "http://localhost:17836",
+  "sources_file": "sources.json",
+  "features": [
+    "Local searchable browser",
+    "Figma development plugin",
+    "Canonical icon IDs",
+    "SVG/HTML/CSS/glyph copying",
+    "React/Vue/Svelte export",
+    "Project manifest sync",
+    "Website favicon collector",
+    "Custom SVG folders",
+    "Cross-platform CLI"
+  ]
+}

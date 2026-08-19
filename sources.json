@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "generated_for": "Omni Icon Vault 4.0.0",
+  "archives": [
+    {
+      "id": "fontawesome-web",
+      "source": "fontawesome",
+      "version": "7.3.1",
+      "required": true,
+      "cache": "fa-web.zip",
+      "target": "fontawesome",
+      "type": "zip",
+      "urls": ["https://github.com/FortAwesome/Font-Awesome/releases/download/7.3.1/fontawesome-free-7.3.1-web.zip"]
+    },
+    {
+      "id": "fontawesome-desktop",
+      "source": "fontawesome",
+      "version": "7.3.1",
+      "required": true,
+      "cache": "fa-desktop.zip",
+      "target": "fontawesome-desktop",
+      "type": "zip",
+      "sha256": "c61edde261707f33376a28e9a30bb8c70c1a20bf0bd975206b809f3b3b70add5",
+      "urls": ["https://github.com/FortAwesome/Font-Awesome/releases/download/7.3.1/fontawesome-free-7.3.1-desktop.zip"]
+    },
+    {
+      "id": "nerdfonts-symbols",
+      "source": "nerdfonts",
+      "version": "3.5.0",
+      "required": true,
+      "cache": "nerd-symbols.tar.xz",
+      "target": "nerdfonts",
+      "type": "tar.xz",
+      "urls": ["https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.0/NerdFontsSymbolsOnly.tar.xz"]
+    },
+    {
+      "id": "bootstrap",
+      "source": "bootstrap",
+      "version": "1.13.1",
+      "required": true,
+      "cache": "bootstrap.zip",
+      "target": "bootstrap",
+      "type": "zip",
+      "urls": ["https://github.com/twbs/icons/releases/download/v1.13.1/bootstrap-icons-1.13.1.zip"]
+    },
+    {
+      "id": "tabler",
+      "source": "tabler",
+      "version": "3.46.0",
+      "required": true,
+      "cache": "tabler.zip",
+      "target": "tabler",
+      "type": "zip",
+      "urls": ["https://github.com/tabler/tabler-icons/archive/refs/tags/v3.46.0.zip"]
+    },
+    {
+      "id": "simpleicons",
+      "source": "simpleicons",
+      "version": "16.28.0",
+      "required": false,
+      "cache": "simpleicons-16.28.0.zip",
+      "target": "simpleicons",
+      "type": "zip",
+      "urls": [
+        "https://github.com/simple-icons/simple-icons/archive/refs/tags/16.28.0.zip",
+        "https://github.com/simple-icons/simple-icons/archive/refs/tags/v16.28.0.zip"
+      ]
+    },
+    {
+      "id": "lucide",
+      "source": "lucide",
+      "version": "1.29.0",
+      "required": false,
+      "cache": "lucide-1.29.0.zip",
+      "target": "lucide",
+      "type": "zip",
+      "urls": [
+        "https://github.com/lucide-icons/lucide/archive/refs/tags/1.29.0.zip",
+        "https://github.com/lucide-icons/lucide/archive/refs/tags/v1.29.0.zip"
+      ]
+    },
+    {
+      "id": "heroicons",
+      "source": "heroicons",
+      "version": "2.2.0",
+      "required": false,
+      "cache": "heroicons-2.2.0.zip",
+      "target": "heroicons",
+      "type": "zip",
+      "urls": ["https://github.com/tailwindlabs/heroicons/archive/refs/tags/v2.2.0.zip"]
+    },
+    {
+      "id": "phosphor",
+      "source": "phosphor",
+      "version": "2.1.1",
+      "required": false,
+      "cache": "phosphor-2.1.1.zip",
+      "target": "phosphor",
+      "type": "zip",
+      "urls": [
+        "https://github.com/phosphor-icons/core/archive/refs/tags/v2.1.1.zip",
+        "https://github.com/phosphor-icons/core/archive/refs/tags/2.1.1.zip"
+      ]
+    },
+    {
+      "id": "iconoir",
+      "source": "iconoir",
+      "version": "7.12.1",
+      "required": false,
+      "cache": "iconoir-7.12.1.zip",
+      "target": "iconoir",
+      "type": "zip",
+      "urls": ["https://github.com/iconoir-icons/iconoir/archive/refs/tags/v7.12.1.zip"]
+    },
+    {
+      "id": "ionicons",
+      "source": "ionicons",
+      "version": "8.0.13",
+      "required": false,
+      "cache": "ionicons-8.0.13.zip",
+      "target": "ionicons",
+      "type": "zip",
+      "urls": [
+        "https://github.com/ionic-team/ionicons/archive/refs/tags/v8.0.13.zip",
+        "https://github.com/ionic-team/ionicons/archive/refs/tags/8.0.13.zip"
+      ]
+    },
+    {
+      "id": "octicons",
+      "source": "octicons",
+      "version": "19.33.0",
+      "required": false,
+      "cache": "octicons-19.33.0.zip",
+      "target": "octicons",
+      "type": "zip",
+      "urls": ["https://github.com/primer/octicons/archive/refs/tags/v19.33.0.zip"]
+    },
+    {
+      "id": "devicon",
+      "source": "devicon",
+      "version": "2.17.0",
+      "required": false,
+      "cache": "devicon-2.17.0.zip",
+      "target": "devicon",
+      "type": "zip",
+      "urls": ["https://github.com/devicons/devicon/archive/refs/tags/v2.17.0.zip"]
+    },
+    {
+      "id": "fluent",
+      "source": "fluent",
+      "version": "1.1.337",
+      "required": false,
+      "cache": "fluent-1.1.337.zip",
+      "target": "fluent",
+      "type": "zip",
+      "urls": ["https://github.com/microsoft/fluentui-system-icons/archive/refs/tags/1.1.337.zip"]
+    }
+  ],
+  "files": [
+    {
+      "id": "nerdfonts-glyphnames",
+      "source": "nerdfonts",
+      "version": "3.5.0",
+      "required": true,
+      "cache": "glyphnames.json",
+      "target": "nerdfonts/glyphnames.json",
+      "urls": ["https://raw.githubusercontent.com/ryanoasis/nerd-fonts/v3.5.0/glyphnames.json"]
+    },
+    {
+      "id": "material-symbols-font",
+      "source": "material",
+      "version": "upstream-master",
+      "required": true,
+      "cache": "material-symbols-outlined.ttf",
+      "target": "material/MaterialSymbolsOutlined.ttf",
+      "urls": ["https://raw.githubusercontent.com/google/material-design-icons/master/variablefont/MaterialSymbolsOutlined%5BFILL%2CGRAD%2Copsz%2Cwght%5D.ttf"]
+    },
+    {
+      "id": "material-symbols-codepoints",
+      "source": "material",
+      "version": "upstream-master",
+      "required": true,
+      "cache": "material-symbols-outlined.codepoints",
+      "target": "material/MaterialSymbolsOutlined.codepoints",
+      "urls": ["https://raw.githubusercontent.com/google/material-design-icons/master/variablefont/MaterialSymbolsOutlined%5BFILL%2CGRAD%2Copsz%2Cwght%5D.codepoints"]
+    }
+  ]
+}

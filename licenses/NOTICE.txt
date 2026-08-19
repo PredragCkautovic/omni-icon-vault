@@ -1,0 +1,5 @@
+Omni Icon Vault 4 is an aggregation, indexing, local-browser and design-to-code tool. It does not claim ownership of upstream icons, logos, brand marks, fonts, or user-collected favicons.
+
+The public repository does not bundle downloaded upstream icon archives. During installation, upstream license/notice files found in downloaded source trees are copied into licenses/upstream/.
+
+See THIRD_PARTY_NOTICES.md for the source list, license summary and trademark caveats.
