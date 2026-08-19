@@ -1,25 +1,16 @@
-# Omni Icon Vault 4.1.1 — Installer reliability hotfix
+# Omni Icon Vault 4.1.2
 
-This patch fixes installation failures discovered on a real Arch Linux install of 4.1.0.
+### Final UI polish
+- Sticky filters and visible active copy-capability indicator.
+- Capability badges and explicit copy hints on icon cards.
+- Responsive Copy/Sort controls remain available on phones.
+- Skeleton loading, refined empty states, and improved card/detail interactions.
+- Detail drawer now shows available copy capabilities and its primary action follows the active copy mode.
 
-## Fixed
+This patch makes the Web UI Copy selector behave as a true filter. Selecting SVG, Glyph, HTML, or CSS immediately narrows the grid to icons that actually support that copy format, including Favorites and Recent views. The local search API now accepts `capability=` and returns capability metadata for consistent pagination and filtering.
 
-- Bootstrap Icons 1.13.1 is now discovered regardless of the release archive layout.
-- Bootstrap can fall back to indexing its SVG files even when font metadata moves or is absent.
-- Required source failures now trigger a targeted clean redownload instead of aborting immediately.
-- Phosphor Core 2.1.1 now comes from the official published npm package; the previous GitHub `v2.1.1` archive URL does not exist.
-- Added safe `.tar.gz`/`.tgz` extraction for npm package archives.
-- A successful repaired installation continues to CLI/font/desktop integration, so `omni-icons` is installed normally.
 
-## Upgrade
 
-Pull 4.1.1 and rerun:
+### Sidebar polish
 
-```bash
-git pull
-python install.py
-omni-icons doctor
-omni-icons open
-```
-
-The installer will reuse healthy caches and automatically redownload a required source if its indexed result is empty.
+The sidebar now uses one consistent monochrome outline icon system across categories and every icon pack, replacing mixed glyphs/monograms/dots with aligned, accessible SVG marks.

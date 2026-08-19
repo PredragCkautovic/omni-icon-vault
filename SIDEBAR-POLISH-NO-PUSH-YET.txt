@@ -1,0 +1,7 @@
+Omni Icon Vault 4.1.2 sidebar polish
+
+Apply this overlay at the repository root, then run:
+  chmod +x APPLY_SIDEBAR_POLISH.sh
+  ./APPLY_SIDEBAR_POLISH.sh
+
+Verify the sidebar visually before committing/pushing.

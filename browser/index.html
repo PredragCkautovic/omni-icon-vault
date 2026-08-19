@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../vendor/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="../vendor/bootstrap/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="fonts.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=4.1.2-sidebar-r2">
 </head>
 <body>
 <div class="app-shell">
@@ -27,25 +27,25 @@
 
     <nav class="primary-nav" id="sourceList" aria-label="Icon library filters">
       <button class="nav-item active" data-source="all">
-        <span class="nav-icon">⌂</span><span>All icons</span><b id="count-all">—</b>
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span><span>All icons</span><b id="count-all">—</b>
       </button>
       <button class="nav-item" data-source="kind:ui">
-        <span class="nav-icon">◫</span><span>UI icons</span><b id="count-ui">—</b>
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h8M16 7h4M4 17h4M12 17h8"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></span><span>UI icons</span><b id="count-ui">—</b>
       </button>
       <button class="nav-item" data-source="kind:brand">
-        <span class="nav-icon">◆</span><span>Brands + favicons</span><b id="count-brand">—</b>
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.2 2.3 3.3 5 3.3 8S14.2 17.7 12 20M12 4c-2.2 2.3-3.3 5-3.3 8S9.8 17.7 12 20"/></svg></span><span>Brands + favicons</span><b id="count-brand">—</b>
       </button>
       <button class="nav-item" data-source="kind:developer">
-        <span class="nav-icon">⌘</span><span>Developer</span><b id="count-developer">—</b>
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14.5 5l-5 14"/></svg></span><span>Developer</span><b id="count-developer">—</b>
       </button>
       <button class="nav-item" data-source="favorites">
-        <span class="nav-icon">★</span><span>Favorites</span><b id="count-favorites">0</b>
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9L12 3Z"/></svg></span><span>Favorites</span><b id="count-favorites">0</b>
       </button>
       <button class="nav-item" data-source="recent">
-        <span class="nav-icon">↺</span><span>Recently used</span><b id="count-recent">0</b>
+        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5V4.5M4.5 4.5h4"/><path d="M5 7a8 8 0 1 1-1 7"/><path d="M12 7.5V12l3 2"/></svg></span><span>Recently used</span><b id="count-recent">0</b>
       </button>
 
-      <div class="nav-section-title"><span>ICON PACKS</span><button id="collapsePacks" title="Collapse icon packs">−</button></div>
+      <div class="nav-section-title"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 5v14M4 10h16"/></svg> ICON PACKS</span><button id="collapsePacks" title="Collapse icon packs">−</button></div>
       <div id="packSources" class="pack-sources"></div>
     </nav>
 
@@ -78,12 +78,12 @@
         <p id="resultText">Connecting to your local icon index…</p>
       </div>
       <div class="hero-actions">
-        <label class="select-wrap"><span>Copy</span><select id="copyMode">
-          <option value="smart">Smart default</option>
-          <option value="svg">SVG</option>
-          <option value="glyph">Glyph</option>
-          <option value="html">HTML</option>
-          <option value="css">CSS</option>
+        <label class="select-wrap" title="Choosing a copy mode also filters the grid to icons that actually support it"><span>Copy / filter</span><select id="copyMode">
+          <option value="smart">Smart default · all icons</option>
+          <option value="svg">SVG only</option>
+          <option value="glyph">Glyph only</option>
+          <option value="html">HTML only</option>
+          <option value="css">CSS only</option>
           <option value="id">Canonical ID</option>
           <option value="manifest">Manifest entry</option>
         </select></label>
@@ -110,13 +110,18 @@
     </section>
 
     <section class="filter-row" aria-label="Quick filters">
-      <div class="filter-chips" id="formatFilters">
-        <button class="chip active" data-format="all">All formats</button>
-        <button class="chip" data-format="svg">Vector SVG</button>
-        <button class="chip" data-format="font">Font glyph</button>
-        <button class="chip" data-format="raster">Raster</button>
+      <div class="filter-left">
+        <div class="filter-chips" id="formatFilters">
+          <button class="chip active" data-format="all">All formats</button>
+          <button class="chip" data-format="svg">Vector SVG</button>
+          <button class="chip" data-format="font">Font glyph</button>
+          <button class="chip" data-format="raster">Raster</button>
+        </div>
+        <div class="capability-pill hidden" id="capabilityPill" title="The copy mode is also filtering the result grid">
+          <span class="capability-dot"></span><span id="capabilityText">SVG capable</span><button id="clearCapability" aria-label="Clear copy capability filter">×</button>
+        </div>
       </div>
-      <div class="query-help">Tip: search <code>github</code>, <code>camera</code>, <code>python</code>, <code>arrow</code>…</div>
+      <div class="query-help">Click a card to copy · <kbd>C</kbd> copy focused · <kbd>Enter</kbd> details</div>
     </section>
 
     <section class="icon-grid" id="grid" aria-live="polite"></section>
@@ -163,11 +168,12 @@
     <div><span>Type</span><strong id="detailType">—</strong></div>
     <div><span>Unicode</span><strong id="detailCode">—</strong></div>
   </div>
+  <div class="detail-capabilities" id="detailCapabilities" aria-label="Available copy formats"></div>
 
   <div class="id-block"><span>Canonical ID</span><code id="idValue"></code><button data-copy="id">Copy</button></div>
 
   <div class="action-grid">
-    <button data-copy="smart" class="primary-action"><span>⌘</span><b>Copy best format</b><small id="smartFormatLabel">SVG</small></button>
+    <button data-copy="smart" class="primary-action" id="primaryCopyButton"><span>⌘</span><b id="primaryCopyLabel">Copy best format</b><small id="smartFormatLabel">SVG</small></button>
     <button data-copy="svg" id="svgCopyButton"><span>◇</span><b>Copy SVG</b><small>Editable vector</small></button>
     <button data-copy="html" id="htmlCopyButton"><span>&lt;/&gt;</span><b>Copy HTML</b><small>Web markup</small></button>
     <button data-copy="css" id="cssCopyButton"><span>#</span><b>Copy CSS</b><small>CSS snippet</small></button>
@@ -189,6 +195,6 @@
   </details>
 </aside>
 
-<script src="app.js"></script>
+<script src="app.js?v=4.1.2-sidebar-r2"></script>
 </body>
 </html>

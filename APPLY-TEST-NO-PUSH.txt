@@ -1,0 +1,72 @@
+Omni Icon Vault v4.1.2 — Copy Capability Filter Patch
+=======================================================
+
+DESTINATION
+-----------
+Apply this overlay at the ROOT of your existing Git checkout:
+  ~/Documents/omni-icon-vault
+
+APPLY
+-----
+cd ~/Documents/omni-icon-vault
+unzip -o ~/Downloads/Omni-Icon-Vault-4.1.2-Copy-Filter-Patch.zip -d .
+
+VERIFY FILE VERSION
+-------------------
+cat VERSION
+# expected: 4.1.2
+
+RUN TESTS
+---------
+python -m unittest discover -s tests -v
+node --check browser/app.js
+python -m py_compile tools/omni_server.py
+
+RESTART LOCAL SERVER
+--------------------
+omni-icons stop || true
+omni-icons start
+omni-icons open
+
+If the old UI is still visible, use Ctrl+Shift+R once.
+The v4.1.2 HTML also cache-busts app.js/style.css.
+
+MANUAL WEB UI TEST
+------------------
+1. Copy / filter = Smart default
+   - normal full library should appear.
+
+2. Copy / filter = SVG only
+   - result count should immediately change.
+   - every displayed icon must have real SVG data.
+   - clicking a card copies SVG text.
+
+3. Copy / filter = Glyph only
+   - only icons with a real copied glyph/character remain.
+   - SVG-capable Font Awesome/Bootstrap icons can still appear if they ALSO have a glyph.
+
+4. Copy / filter = HTML only
+   - only icons with an actual HTML payload remain.
+
+5. Copy / filter = CSS only
+   - only icons with an actual CSS payload remain.
+
+6. Test the filter with:
+   - search text
+   - pack/source filters
+   - Favorites
+   - Recent
+   - Load more pagination
+   - Random icon
+
+7. Return Copy / filter to Smart default
+   - full results should return.
+
+OPTIONAL API CHECK
+------------------
+curl -s 'http://localhost:17836/api/search?capability=svg&limit=2' | python -m json.tool
+curl -s 'http://localhost:17836/api/search?capability=glyph&limit=2' | python -m json.tool
+curl -s 'http://localhost:17836/api/stats' | python -m json.tool
+
+DO NOT PUSH YET.
+When everything works, commit/push v4.1.2 in a separate step.

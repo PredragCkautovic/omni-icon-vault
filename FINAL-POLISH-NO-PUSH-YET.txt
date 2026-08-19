@@ -1,0 +1,22 @@
+Omni Icon Vault 4.1.2 — final pre-push polish
+
+Destination:
+  Extract this ZIP directly into the root of your existing omni-icon-vault Git repository.
+
+Changed files:
+  browser/index.html
+  browser/style.css
+  browser/app.js
+  tests/test_core.py
+  CHANGELOG.md
+  RELEASE_NOTES.md
+  APPLY_FINAL_POLISH.sh
+
+This overlay assumes the working 4.1.2 R3 filter/server fix has already been applied.
+It does not change the API capability filtering logic.
+
+After extraction:
+  chmod +x APPLY_FINAL_POLISH.sh
+  ./APPLY_FINAL_POLISH.sh
+
+Do not push until the final UI checks look correct on your real installation.

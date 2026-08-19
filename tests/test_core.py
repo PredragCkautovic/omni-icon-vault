@@ -18,11 +18,22 @@ spec=importlib.util.spec_from_file_location('omni_install',ROOT/'install.py')
 install=importlib.util.module_from_spec(spec);spec.loader.exec_module(install)
 
 class CoreTests(unittest.TestCase):
+    def test_browser_final_polish_keeps_copy_controls_mobile_and_shows_capabilities(self):
+        html=(ROOT/'browser'/'index.html').read_text(encoding='utf-8')
+        js=(ROOT/'browser'/'app.js').read_text(encoding='utf-8')
+        css=(ROOT/'browser'/'style.css').read_text(encoding='utf-8')
+        self.assertIn('id="capabilityPill"', html)
+        self.assertIn('id="detailCapabilities"', html)
+        self.assertIn('cardCopyLabel', js)
+        self.assertIn('capabilityBadges', js)
+        self.assertIn('@media(max-width:560px){.hero-actions{display:grid', css)
+        self.assertIn('.filter-row{position:sticky', css)
+
     def test_version_and_manifest_match(self):
         v=(ROOT/'VERSION').read_text().strip()
         manifest=json.loads((ROOT/'manifest.json').read_text())
         self.assertEqual(v,manifest['version'])
-        self.assertEqual(v,'4.1.1')
+        self.assertEqual(v,'4.1.2')
 
     def test_sources_are_pinned_and_unique(self):
         cfg=json.loads((ROOT/'sources.json').read_text())
@@ -115,6 +126,36 @@ class CoreTests(unittest.TestCase):
             self.assertEqual(store.stats['formats']['svg'],2)
             self.assertEqual(store.stats['formats']['font'],1)
 
+    def test_server_copy_capability_filter_is_exact(self):
+        from omni_server import IconStore
+        with tempfile.TemporaryDirectory() as td:
+            td=Path(td);(td/'browser').mkdir()
+            items=[
+                {'id':'svg-only','source':'tabler','name':'vector','label':'Vector','svg':'<svg/>','html':'<svg/>','css':'/* vector */'},
+                {'id':'glyph-only','source':'material','name':'glyph','label':'Glyph','char':'X','html':'<span>X</span>','css':'.glyph{}'},
+                {'id':'both','source':'fontawesome','name':'both','label':'Both','svg':'<svg/>','char':'Y','html':'<i></i>','css':'.both{}'},
+                {'id':'raster','source':'favicons','name':'site','label':'Site','raster':'/a.png','html':'<img src="/a.png">'},
+            ]
+            (td/'browser'/'icon-data.json').write_text(json.dumps(items))
+            store=IconStore(td)
+            svg,total=store.search('',capability='svg');self.assertEqual(total,2);self.assertEqual({i['id'] for i in svg},{'svg-only','both'})
+            glyph,total=store.search('',capability='glyph');self.assertEqual(total,2);self.assertEqual({i['id'] for i in glyph},{'glyph-only','both'})
+            html,total=store.search('',capability='html');self.assertEqual(total,4)
+            css,total=store.search('',capability='css');self.assertEqual(total,3)
+            asset,total=store.search('',capability='asset');self.assertEqual(total,1);self.assertEqual(asset[0]['id'],'raster')
+            summary=store.summary(items[2]);self.assertIn('svg',summary['capabilities']);self.assertIn('glyph',summary['capabilities'])
+            self.assertEqual(store.stats['capabilities']['glyph'],2)
+
+    def test_browser_copy_dropdown_drives_capability_filter(self):
+        js=(ROOT/'browser'/'app.js').read_text('utf-8')
+        html=(ROOT/'browser'/'index.html').read_text('utf-8')
+        self.assertIn('capability:state.copyMode',js)
+        self.assertIn("setCopyMode(e.target.value)",js)
+        self.assertIn("supportsCopy(i,state.copyMode)",js)
+        self.assertIn('Copy / filter',html)
+        self.assertIn('SVG only',html)
+        self.assertIn('Glyph only',html)
+
     def test_custom_svg_index_uses_sanitizer(self):
         text=(ROOT/'tools'/'build-index.py').read_text('utf-8')
         self.assertIn('read_svg(p, sanitize=True)',text)
@@ -144,5 +185,39 @@ class CoreTests(unittest.TestCase):
         text=(ROOT/'install.py').read_text('utf-8')
         self.assertIn('reset_source_assets(affected)',text)
         self.assertIn('only_sources=affected',text)
+
+    def test_server_health_has_api_revision_and_browser_assets_no_store(self):
+        text=(ROOT/'tools'/'omni_server.py').read_text('utf-8')
+        self.assertIn('API_REVISION=3',text)
+        self.assertIn("'apiRevision':API_REVISION",text)
+        self.assertIn("self.path.startswith('/browser/')",text)
+
+    def test_platform_restarts_stale_api_revision(self):
+        self.assertFalse(platform_utils.health_is_compatible({'ok':True,'version':'4.1.2'}))
+        self.assertFalse(platform_utils.health_is_compatible({'ok':True,'apiRevision':2}))
+        self.assertTrue(platform_utils.health_is_compatible({'ok':True,'apiRevision':3}))
+        text=(ROOT/'tools'/'platform_utils.py').read_text('utf-8')
+        self.assertIn('stop_server(port)',text)
+
+    def test_stale_process_detection_is_omni_specific(self):
+        self.assertTrue(platform_utils._looks_like_omni_server_command('/usr/bin/python /home/me/omni-icon-vault/tools/omni_server.py --port 17836'))
+        self.assertTrue(platform_utils._looks_like_omni_server_command(r'C:\\Users\\me\\OmniIconVault\\tools\\omni_server.py --port 17836'))
+        self.assertFalse(platform_utils._looks_like_omni_server_command('/usr/bin/python -m http.server 17836'))
+        self.assertFalse(platform_utils._looks_like_omni_server_command('/usr/bin/python other_server.py'))
+
+    def test_health_exposes_pid_and_root_for_future_clean_restart(self):
+        text=(ROOT/'tools'/'omni_server.py').read_text('utf-8')
+        self.assertIn("'product':'Omni Icon Vault'", text)
+        self.assertIn("'pid':os.getpid()", text)
+        self.assertIn("'root':str(store.root)", text)
+        platform=(ROOT/'tools'/'platform_utils.py').read_text('utf-8')
+        self.assertIn('_listener_pids(port)', platform)
+        self.assertIn('_terminate_omni_pid(pid)', platform)
+
+    def test_browser_rejects_unapplied_capability_filter(self):
+        js=(ROOT/'browser'/'app.js').read_text('utf-8')
+        self.assertIn('REQUIRED_API_REVISION=3',js)
+        self.assertIn('d.appliedFilters?.capability!==state.copyMode',js)
+        self.assertIn('page=page.filter(i=>supportsCopy(i,state.copyMode))',js)
 
 if __name__=='__main__':unittest.main()

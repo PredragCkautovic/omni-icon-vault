@@ -1,0 +1,16 @@
+Omni Icon Vault 4.1.2 — Copy Filter Fix R3
+============================================
+
+This patch fixes stale Omni API processes that remain bound to localhost:17836
+when their PID file is missing or stale.
+
+Apply to the repository root, then run:
+
+  chmod +x APPLY_AND_VERIFY_FILTER_FIX.sh
+  ./APPLY_AND_VERIFY_FILTER_FIX.sh
+
+The script now stops any old Omni server first, using safe process ownership
+checks, starts the current API revision, and verifies copy-capability filtering
+against the real installed icon index.
+
+Do not push this patch until the browser behavior is confirmed on the real machine.

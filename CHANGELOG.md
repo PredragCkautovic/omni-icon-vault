@@ -1,5 +1,22 @@
 # Changelog
 
+## 4.1.2
+
+- Polished the Web UI sidebar icon system: every main category and every pack now uses a uniform monochrome outline icon, consistent sizing, alignment, hover, and active states.
+
+
+### Final UI polish
+- Sticky filters and visible active copy-capability indicator.
+- Capability badges and explicit copy hints on icon cards.
+- Responsive Copy/Sort controls remain available on phones.
+- Skeleton loading, refined empty states, and improved card/detail interactions.
+- Detail drawer now shows available copy capabilities and its primary action follows the active copy mode.
+
+- Copy mode is now a real capability filter in the Web UI.
+- SVG shows only icons backed by SVG data; Glyph only icons with a glyph; HTML/CSS only icons with those copy payloads.
+- Favorites, Recent, paginated API search, and Random all honor the selected copy capability.
+- API summaries expose per-icon `capabilities`, and `/api/stats` reports capability counts.
+
 ## 4.1.1 — Installer reliability hotfix
 
 - Fix Bootstrap Icons 1.13.1 release-layout detection and add an SVG-only indexing fallback.

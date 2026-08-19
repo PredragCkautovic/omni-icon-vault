@@ -15,6 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PORT = 17836
+EXPECTED_API_REVISION = 3
 
 
 def system_name() -> str:
@@ -62,6 +63,109 @@ def health(port: int = DEFAULT_PORT, timeout: float = 0.8) -> dict | None:
         return None
 
 
+def health_is_compatible(data: dict | None) -> bool:
+    """True only when the running API process supports this checkout's protocol.
+
+    VERSION alone is not sufficient because a long-running Python process can read a
+    newly-written VERSION file while still executing old server code.
+    """
+    if not data or not data.get("ok"):
+        return False
+    try:
+        return int(data.get("apiRevision", 0)) >= EXPECTED_API_REVISION
+    except (TypeError, ValueError):
+        return False
+
+
+
+
+def _process_command(pid: int) -> str:
+    """Best-effort command line lookup for a process owned by this user."""
+    if pid <= 0:
+        return ""
+    system = system_name()
+    try:
+        if system == "linux":
+            raw = Path(f"/proc/{pid}/cmdline").read_bytes()
+            return raw.replace(b"\x00", b" ").decode("utf-8", "replace").strip()
+        if system == "windows":
+            ps = shutil.which("powershell") or shutil.which("pwsh")
+            if ps:
+                cmd = [ps, "-NoProfile", "-Command", f"(Get-CimInstance Win32_Process -Filter 'ProcessId = {pid}').CommandLine"]
+                r = subprocess.run(cmd, capture_output=True, text=True, timeout=2, check=False)
+                return (r.stdout or "").strip()
+        # macOS and portable POSIX fallback.
+        r = subprocess.run(["ps", "-p", str(pid), "-o", "command="], capture_output=True, text=True, timeout=2, check=False)
+        return (r.stdout or "").strip()
+    except Exception:
+        return ""
+
+
+def _looks_like_omni_server_command(command: str) -> bool:
+    c = (command or "").replace('\\', '/').lower()
+    return "omni_server.py" in c and ("omni-icon-vault" in c or "omniiconvault" in c)
+
+
+def _listener_pids(port: int) -> list[int]:
+    """Return PIDs listening on a TCP port without killing anything."""
+    found: set[int] = set()
+    system = system_name()
+    try:
+        if system in ("linux", "darwin") and shutil.which("lsof"):
+            r = subprocess.run(
+                ["lsof", "-nP", f"-iTCP:{port}", "-sTCP:LISTEN", "-t"],
+                capture_output=True, text=True, timeout=2, check=False,
+            )
+            for token in (r.stdout or "").split():
+                if token.isdigit():
+                    found.add(int(token))
+        if system == "linux" and not found and shutil.which("ss"):
+            r = subprocess.run(["ss", "-ltnp"], capture_output=True, text=True, timeout=2, check=False)
+            for line in (r.stdout or "").splitlines():
+                if f":{port}" not in line:
+                    continue
+                for match in __import__('re').finditer(r"pid=(\d+)", line):
+                    found.add(int(match.group(1)))
+        if system == "windows":
+            r = subprocess.run(["netstat", "-ano", "-p", "tcp"], capture_output=True, text=True, timeout=3, check=False)
+            for line in (r.stdout or "").splitlines():
+                parts = line.split()
+                if len(parts) < 5 or parts[0].upper() != "TCP" or parts[3].upper() != "LISTENING":
+                    continue
+                local = parts[1]
+                if local.rsplit(':', 1)[-1] == str(port) and parts[-1].isdigit():
+                    found.add(int(parts[-1]))
+    except Exception:
+        pass
+    return sorted(found)
+
+
+def _terminate_omni_pid(pid: int, wait: float = 2.0) -> bool:
+    """Terminate only a process whose command line identifies it as Omni."""
+    command = _process_command(pid)
+    if not _looks_like_omni_server_command(command):
+        return False
+    try:
+        if system_name() == "windows":
+            subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+            return True
+        os.kill(pid, signal.SIGTERM)
+    except OSError:
+        return True
+    deadline = time.time() + wait
+    while time.time() < deadline:
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            return True
+        time.sleep(0.05)
+    try:
+        os.kill(pid, signal.SIGKILL)
+    except OSError:
+        pass
+    return True
+
+
 def _python_for_background() -> str:
     if system_name() == "windows":
         p = Path(sys.executable)
@@ -73,8 +177,20 @@ def _python_for_background() -> str:
 
 def start_server(port: int = DEFAULT_PORT, quiet: bool = True, wait: float = 5.0) -> dict:
     existing = health(port)
-    if existing:
+    if existing and health_is_compatible(existing):
         return {"started": False, "health": existing, "pid": None}
+    if existing:
+        # The local static files may already be updated while an older Python server
+        # is still alive in memory. Restart it so new API filters actually execute.
+        stop_server(port)
+        deadline = time.time() + 3.0
+        while time.time() < deadline and health(port, timeout=0.2):
+            time.sleep(0.1)
+        if health(port, timeout=0.2):
+            raise RuntimeError(
+                "An outdated Omni server is still using the local port. "
+                "Run 'omni-icons stop' and try again."
+            )
 
     if not (ROOT / "browser" / "icon-data.json").exists():
         raise RuntimeError("Icon index is missing. Run the installer first.")
@@ -114,8 +230,15 @@ def start_server(port: int = DEFAULT_PORT, quiet: bool = True, wait: float = 5.0
 
 
 def stop_server(port: int = DEFAULT_PORT) -> bool:
+    """Stop the local Omni server, including stale processes with lost PID files.
+
+    Safety rule: process discovery may inspect any listener on the configured port,
+    but it only terminates a PID when its command line is recognizably Omni.
+    """
     stopped = False
     system = system_name()
+
+    # Stop platform-managed autostart first so it cannot immediately respawn.
     if system == "linux" and shutil.which("systemctl"):
         r = subprocess.run(["systemctl", "--user", "is-active", "--quiet", "omni-icon-vault.service"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if r.returncode == 0:
@@ -127,20 +250,40 @@ def stop_server(port: int = DEFAULT_PORT) -> bool:
             subprocess.run(["launchctl", "unload", str(agent)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
             stopped = True
 
+    # Prefer the current server's self-reported PID when available.
+    h = health(port, timeout=0.3)
+    if h:
+        try:
+            pid = int(h.get("pid", 0))
+        except (TypeError, ValueError):
+            pid = 0
+        if pid and _terminate_omni_pid(pid):
+            stopped = True
+
+    # Then try our runtime PID file, but never trust it blindly: stale PID files can
+    # point at unrelated processes after PID reuse.
     rdir = runtime_dir()
     pid_file = rdir / "server.pid"
     if pid_file.exists():
         try:
             pid = int(pid_file.read_text("utf-8").strip())
-            os.kill(pid, signal.SIGTERM)
-            stopped = True
+            if _terminate_omni_pid(pid):
+                stopped = True
         except (OSError, ValueError):
             pass
         try:
             pid_file.unlink()
         except OSError:
             pass
-    for _ in range(30):
+
+    # Recovery path for upgrades from older Omni versions: discover the process that
+    # actually owns the port and terminate it only if its command line is Omni.
+    if health(port, timeout=0.2):
+        for pid in _listener_pids(port):
+            if _terminate_omni_pid(pid):
+                stopped = True
+
+    for _ in range(40):
         if not health(port, timeout=0.2):
             break
         time.sleep(0.1)
